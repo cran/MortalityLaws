@@ -1,10 +1,21 @@
 #' Life Table Function
 #' 
-#' Function to create a full or abridge life table with various choices of 2 input vectors: 
-#' \code{(x, Dx, Ex)} or \code{(x, mx)} or \code{(x, qx)}.
+#' Construct either a full or abridge life table with various input choices like:
+#' death counts and mid-interval population estimates \code{(Dx, Ex)} or 
+#' age-specific death rates \code{(mx)} or death probabilities \code{(qx)}
+#' or survivorship curve \code{(lx)} or a distribution of deaths \code{(dx)}.
+#' If one of these options are specified, the other can be ignored.
 #'  
 #' @details The input data can be of an object of class: 
 #' \code{numeric}, \code{matrix} or \code{data.frame}.
+#' @usage 
+#' LifeTable(x, Dx = NULL, Ex = NULL,
+#'              mx = NULL,
+#'              qx = NULL,
+#'              lx = NULL,
+#'              dx = NULL,
+#'              sex = NULL,
+#'              lx0 = 1e+05)
 #' @param x vector of age at the beginning of the age classes
 #' @param Dx object containing death counts. An element of the \code{Dx} object, 
 #' represents the number of deaths during the year to persons aged x to x+n. 
@@ -18,10 +29,10 @@
 #' This argument affects the first two values in the life table ax column. 
 #' If sex is specified the values are computed based on Coale-Demeny method 
 #' and are slightly different for males than for females. 
-#' Options: \code{NULL, males, females, total}.
+#' Options: \code{NULL, male, female, total}.
 #' @param lx0 radix. Default: 100 000
-#' @return The output is of class \code{lifetable} with the components:
-#' @return \item{lt}{ computed life table with rounded values}
+#' @return The output is of class \code{LifeTable} with the components:
+#' @return \item{lt}{ computed life table}
 #' @return \item{call}{ a call in which all of the specified arguments are 
 #' specified by their full names.}
 #' @return \item{process_date}{ time stamp}
@@ -40,13 +51,17 @@
 #' LT5 <- LifeTable(x, dx = LT1$lt$dx)
 #'
 #' LT1
+#' LT5
 #' ls(LT5) 
 #' 
 #' # Example 2 --- Compute multiple life tables at once ---
 #' 
 #' LTs = LifeTable(x, mx = ahmd$mx)
 #' LTs
+#' # A warning is printed if the input contains missing values. 
+#' # Some of the missing values can be handled by the function.
 #' 
+#' #' 
 #' # Example 3 --- Abridge life table ------------
 #' 
 #' x  = c(0, 1, seq(5, 110, by = 5))
@@ -65,14 +80,15 @@ LifeTable <- function(x, Dx = NULL, Ex = NULL, mx = NULL,
   input <- c(as.list(environment()))
   X     <- LifeTable.check(input)
   
-  if (X$class.numeric) {
+  if (X$iclass == "numeric") {
     LT    <- with(X, LifeTable.core(x, Dx, Ex, mx, qx, lx, dx, sex, lx0))
   } else {
     LT = NULL
-    for (i in 1:X$n) {
+    for (i in 1:X$nLT) {
       LTi <- with(X, LifeTable.core(x, Dx[,i], Ex[,i], mx[,i], 
                                     qx[,i], lx[,i], dx[,i], sex, lx0))
-      LTi <- cbind(LT = X$c_names[i], LTi)
+      LTname <- if (is.na(X$LTnames[i])) i else  X$LTnames[i]
+      LTi <- cbind(LT = LTname, LTi)
       LT  <- rbind(LT, LTi)
     }
   }
@@ -95,28 +111,34 @@ LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0){
   nx       <- c(diff(x), Inf)
   
   if (my.case == "C1_DxEx") {
+    Dx <- as.numeric(Dx)
+    Ex <- as.numeric(Ex)
     mx <- Dx/Ex 
     qx <- mx_qx(x, mx, out = "qx")
     lx <- lx0 * c(1, cumprod(1 - qx)[1:(N - 1)])
     dx <- lx * qx
   }
   if (my.case == "C2_mx") {
+    mx <- as.numeric(mx)
     qx <- mx_qx(x, mx, out = "qx")
     lx <- lx0 * c(1, cumprod(1 - qx)[1:(N - 1)])
     dx <- lx * qx
   }
   if (my.case == "C3_qx") {
+    qx <- as.numeric(qx)
     mx <- mx_qx(x, qx, out = "mx")
     lx <- lx0 * c(1, cumprod(1 - qx)[1:(N - 1)])
     dx <- lx * qx
   }
   if (my.case == "C4_lx") {
+    lx <- as.numeric(lx)
     dx <- c(rev(diff(rev(lx))), 0)
     qx <- dx/lx
     qx[is.na(qx) & x >= 100] <- 1
     mx <- mx_qx(x, qx, out = "mx")
   }
   if (my.case == "C5_dx") {
+    dx <- as.numeric(dx)
     lx <- rev(cumsum(rev(dx)))
     qx <- dx/lx
     qx[is.na(qx) & x >= 100] <- 1
@@ -139,15 +161,15 @@ LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0){
 }
 
 
-#' Function that determintes the case/problem we have to solve
-#' It also performes some checks
+#' Function that identifies the case/problem we have to solve
+#' It also performs several checks
 #' @inheritParams LifeTable
 #' @keywords internal
 #' 
-find.my.case <- function(Dx, Ex, mx, qx, lx, dx) {
-  
-  dta     <- list(Dx, Ex, mx, qx, lx, dx)
-  my_case <- !unlist(lapply(dta, is.null))
+find.my.case <- function(Dx = NULL, Ex = NULL, mx = NULL, 
+                         qx = NULL, lx = NULL, dx = NULL) {
+  input   <- c(as.list(environment()))
+  my_case <- !unlist(lapply(input, is.null))
   if (sum(my_case[c(1, 2)]) == 1) stop("If you input 'Dx' you must input 'Ex' as well, and viceversa", call. = FALSE)
   
   rn <- c("C1_DxEx", "C2_mx", "C3_qx", "C4_lx", "C5_dx")
@@ -158,22 +180,28 @@ find.my.case <- function(Dx, Ex, mx, qx, lx, dx) {
                          F,F,F,T,F,F,
                          F,F,F,F,T,F,
                          F,F,F,F,F,T))
-  
   case = "C0"
   for (i in 1:nrow(mat)) if (all(my_case == mat[i, ])) case <- rn[i]
   if (case == "C0") stop("Check again the input arguments. Too many inputs (Dx, Ex, mx, qx, lx, dx)", call. = F)
   
-  n = c_names = NA
-  NT <- any("numeric" %in% unlist(lapply(dta, class)))
-  if (!NT) { 
-    dt <- dta[mat[case,]][[1]]
-    n  <- ncol(dt) 
-    c_names <- colnames(dt) 
+  X        <- input[my_case][[1]]
+  my_class <- class(X)
+  Aclasses <- c("numeric", "matrix", "data.frame", NULL)
+  L1       <- my_class %in% Aclasses
+  if (!L1) stop(paste0("The class of the input should be: ", 
+                       paste(Aclasses, collapse = ", ")), call. = F)
+  
+  if (my_class %in% Aclasses[2:3]) {
+    nLT     <- ncol(X)     # number of LTs to be created
+    LTnames <- colnames(X) #the names to be assigned to LTs
+  } else {
+    nLT = LTnames <- NA
   }
   
-  out <- list(case = case, class.numeric = NT,  n = n, c_names = c_names)
+  out <- list(case = case, iclass = my_class, nLT = nLT, LTnames = LTnames)
   return(out)
 }
+
 
 
 #' mx to qx
@@ -252,11 +280,15 @@ coale.demeny.ax <- function(x, mx, ax, sex) {
 #' @keywords internal
 LifeTable.check <- function(input) {
   with(input, {
-    fmc  <- find.my.case(Dx, Ex, mx, qx, lx, dx)
-    C    <- fmc$case
+    Y    <- find.my.case(Dx, Ex, mx, qx, lx, dx)
+    C    <- Y$case
     SMS1 <- "contains missing values."
     SMS2 <- "NA's were replaced with"
     
+    if (!is.null(sex)) {
+      if (!(sex %in% c("male", "female", "total"))) 
+        stop("'sex' should be: 'male', 'female', 'total' or 'NULL'.", call. = F)
+    }
     if (C == "C1_DxEx") {
       if (any(is.na(Dx))) warning(paste("'Dx'", SMS1, SMS2, 0), call. = F)
       if (any(is.na(Ex))) warning(paste("'Ex'", SMS1, SMS2, 0.01), call. = F)
@@ -265,7 +297,7 @@ LifeTable.check <- function(input) {
     }
     if (C == "C2_mx") {
       if (any(is.na(mx))) {
-        warning(paste("'mx'", SMS1, SMS2, "maximum obeserved mx:", max(mx, na.rm = T)), call. = F)
+        warning(paste("'mx'", SMS1, SMS2, "maximum observed mx:", max(mx, na.rm = T)), call. = F)
         mx[is.na(mx)] <- max(mx, na.rm = T)
       }
     }
@@ -291,7 +323,7 @@ LifeTable.check <- function(input) {
     }
     out <- list(x = x, Dx = Dx, Ex = Ex, mx = mx, qx = qx, 
                 lx = lx, dx = dx, sex = sex, lx0 = lx0, 
-                class.numeric = fmc$class.numeric, n = fmc$n, c_names = fmc$c_names)
+                iclass = Y$iclass, nLT = Y$nLT, LTnames = Y$LTnames)
     return(out)
   })
 }
@@ -323,8 +355,3 @@ print.LifeTable <- function(x, ...){
   cat("Age intervals:", head_tail(lt$x.int, hlength = 3, tlength = 3), "\n\n")
   print(out, row.names = FALSE)
 } 
-
-
-
-
-

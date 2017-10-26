@@ -4,16 +4,16 @@
 \alias{MortalityLaw}
 \title{Fit Mortality Laws}
 \usage{
-MortalityLaw(x, mx = NULL, qx = NULL, Dx = NULL, Ex = NULL,
-  law = NULL, opt.method = "poissonL", parS = NULL, fit.this.x = x,
-  custom.law = NULL, show = TRUE)
+MortalityLaw(x, Dx = NULL, Ex = NULL, mx = NULL, qx = NULL, 
+                law = NULL, 
+                opt.method = "poissonL", 
+                parS = NULL, 
+                fit.this.x = x,
+                custom.law = NULL, 
+                show = TRUE)
 }
 \arguments{
 \item{x}{vector of age at the beginning of the age classes}
-
-\item{mx}{age-specific death rates}
-
-\item{qx}{probability of dying between age x and x+n.}
 
 \item{Dx}{object containing death counts. An element of the \code{Dx} object, 
 represents the number of deaths during the year to persons aged x to x+n.}
@@ -21,14 +21,18 @@ represents the number of deaths during the year to persons aged x to x+n.}
 \item{Ex}{exposure in the period. \code{Ex} can be approximated by the 
 mid-year population aged x to x+n}
 
+\item{mx}{age-specific death rates}
+
+\item{qx}{probability of dying between age x and x+n.}
+
 \item{law}{the name of the mortality law/model to be fitted. e.g. \code{gompertz}, 
-\code{makeham}, ... To investigate all the possible options see \code{\link{availableLaws}}
+\code{makeham}, ... To investigate all the possible options, see \code{\link{availableLaws}}
 function.}
 
 \item{opt.method}{how would you like to find the parameters? Specify the function 
 to be optimize. Available options: the Poisson likelihood function 
 \code{poissonL}; the Binomial likelihood function -\code{binomialL}; 
-and other 6 loss functions. For more details check \code{\link{availableLF}} function.}
+and other 6 loss functions. For more details, check \code{\link{availableLF}} function.}
 
 \item{parS}{starting parameters used in optimization process (optional).}
 
@@ -57,13 +61,18 @@ The output is of \code{"MortalityLaw"} class with the components:
 
 \item{goodness.of.fit}{ list containing goodness of fit measures like 
 AIC, BIC and log-Likelihood}
+
+\item{opt.diagnosis}{ the resulted optimization object useful for 
+checking the convergence etc.}
 }
 \description{
-This function can be used to fit parametric mortality models given a set of data. 
+Fit parametric mortality models given a set of input data which can be 
+represented by death counts and mid-interval population estimates \code{(Dx, Ex)}
+or age-specific death rates \code{(mx)} or death probabilities \code{(qx)}. 
 Using the argument \code{law} one can specify the model to be fitted. 
 So far 27 parametric model have been implemented; check \code{\link{availableLaws}}
 function to learn about the available options. The models can be fitted under 
-the maximum likelihood methodology of by selecting a loss function to be 
+the maximum likelihood methodology or by selecting a loss function to be 
 optimised. See the implemented loss function by running 
 \code{\link{availableLF}} function.
 }
@@ -95,13 +104,17 @@ M1 <- MortalityLaw(x = x,
                    law = 'makeham')
 M1
 ls(M1)
+coef(M1)
 summary(M1)
+predict(M1, x = 25:95)
+plot(M1)
 
 # Example 2: ---
-# We can fit the same model using diffrent data 
-# format and a different optimization method
+# We can fit the same model using a different data format 
+# and a different optimization method. Also we can scale down 'x'.
 mx <- ahmd$mx[paste(x), ]
-M2 <- MortalityLaw(x = x, 
+x.scaled <- x - min(x) + 1
+M2 <- MortalityLaw(x = x.scaled, 
                    mx = mx, 
                    law = 'makeham', 
                    opt.method = 'LF1')
@@ -109,12 +122,14 @@ M2
 
 # Example 3: ---
 # Now let's fit a mortality law that is not defined 
-# in the package, say a reparametrize Gompertz in 
+# in the package, say a reparameterized Gompertz in 
 # terms of modal age at death
 # hx = b*exp(b*(x-m)) (here b and m are the parameters to be estimated)
 
-my_gompertz <- function(x, par = c(b = 0.13, m = 45)){
-  hx  <- with(as.list(par), b*exp(b*(x - m)) )
+# A function with 'x' and 'par' as input has to be defined, which returns at least
+# an object called 'hx' (hazard rate).
+my_gompertz <- function(x, par = c(b = 0.13, M = 45)){
+  hx  <- with(as.list(par), b*exp(b*(x - M)) )
   return(as.list(environment()))
 }
 
@@ -123,6 +138,8 @@ M3 <- MortalityLaw(x = x,
                    Ex = Ex, 
                    custom.law = my_gompertz) 
 summary(M3)
+# predict M3 for different ages
+predict(M3, x = 85:130)
 
 # Example 4: ---
 # Fit Heligman-Pollard model for a single 
@@ -136,5 +153,4 @@ M4 <- MortalityLaw(x = x,
                    opt.method = 'LF2')
 M4
 plot(M4)
-
 }
