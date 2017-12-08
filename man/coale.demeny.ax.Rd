@@ -8,11 +8,16 @@ Here we adjust the first two values of ax to account for infant mortality more a
 coale.demeny.ax(x, mx, ax, sex)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{Vector of ages at the beginning of the age interval.}
 
-\item{mx}{age-specific death rates}
+\item{mx}{Death rate in age interval [x, x+n).}
 
-\item{sex}{sex of the population considered here. Default: \code{NULL}. 
+\item{ax}{Numeric scalar. Subject-time alive in age-interval for those who 
+die in the same interval. If \code{NULL} this will be estimated. A common 
+assumption is \code{ax = 0.5}, i.e. the deaths occur in the middle of 
+the interval. Default: \code{NULL}.}
+
+\item{sex}{Sex of the population considered here. Default: \code{NULL}. 
 This argument affects the first two values in the life table ax column. 
 If sex is specified the values are computed based on Coale-Demeny method 
 and are slightly different for males than for females. 

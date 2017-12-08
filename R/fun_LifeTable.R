@@ -15,27 +15,32 @@
 #'              lx = NULL,
 #'              dx = NULL,
 #'              sex = NULL,
-#'              lx0 = 1e+05)
-#' @param x vector of age at the beginning of the age classes
-#' @param Dx object containing death counts. An element of the \code{Dx} object, 
+#'              lx0 = 1e+05,
+#'              ax  = NULL)
+#' @param x Vector of ages at the beginning of the age interval.
+#' @param Dx Object containing death counts. An element of the \code{Dx} object, 
 #' represents the number of deaths during the year to persons aged x to x+n. 
-#' @param Ex exposure in the period. \code{Ex} can be approximated by the 
-#' mid-year population aged x to x+n
-#' @param mx age-specific death rates
-#' @param qx probability of dying between age x and x+n. 
-#' @param lx probability to survive up until age x
-#' @param dx life table death counts at age x
-#' @param sex sex of the population considered here. Default: \code{NULL}. 
+#' @param Ex Exposure in the period. \code{Ex} can be approximated by the 
+#' mid-year population aged x to x+n.
+#' @param mx Death rate in age interval [x, x+n).
+#' @param qx Probability of dying in age interval [x, x+n).
+#' @param lx Probability to survive up until age x.
+#' @param dx Deaths by life-table population in age interval [x, x+n).
+#' @param sex Sex of the population considered here. Default: \code{NULL}. 
 #' This argument affects the first two values in the life table ax column. 
 #' If sex is specified the values are computed based on Coale-Demeny method 
 #' and are slightly different for males than for females. 
 #' Options: \code{NULL, male, female, total}.
-#' @param lx0 radix. Default: 100 000
+#' @param lx0 Radix. Default: 100 000.
+#' @param ax Numeric scalar. Subject-time alive in age-interval for those who 
+#' die in the same interval. If \code{NULL} this will be estimated. A common 
+#' assumption is \code{ax = 0.5}, i.e. the deaths occur in the middle of 
+#' the interval. Default: \code{NULL}.
 #' @return The output is of class \code{LifeTable} with the components:
-#' @return \item{lt}{ computed life table}
-#' @return \item{call}{ a call in which all of the specified arguments are 
-#' specified by their full names.}
-#' @return \item{process_date}{ time stamp}
+#' @return \item{lt}{Computed life table;}
+#' @return \item{call}{\code{Call} in which all of the specified arguments are 
+#' specified by their full names;}
+#' @return \item{process_date}{Time stamp.}
 #' @examples 
 #' # Example 1 --- Full life tables with different inputs ---
 #'  
@@ -61,7 +66,6 @@
 #' # A warning is printed if the input contains missing values. 
 #' # Some of the missing values can be handled by the function.
 #' 
-#' #' 
 #' # Example 3 --- Abridge life table ------------
 #' 
 #' x  = c(0, 1, seq(5, 110, by = 5))
@@ -75,21 +79,21 @@
 #'
 LifeTable <- function(x, Dx = NULL, Ex = NULL, mx = NULL, 
                       qx = NULL, lx = NULL, dx = NULL,
-                      sex = NULL, lx0 = 1e+05){
+                      sex = NULL, lx0 = 1e+05, ax = NULL){
   
   input <- c(as.list(environment()))
   X     <- LifeTable.check(input)
   
   if (X$iclass == "numeric") {
-    LT    <- with(X, LifeTable.core(x, Dx, Ex, mx, qx, lx, dx, sex, lx0))
+    LT <- with(X, LifeTable.core(x, Dx, Ex, mx, qx, lx, dx, sex, lx0, ax))
   } else {
     LT = NULL
     for (i in 1:X$nLT) {
       LTi <- with(X, LifeTable.core(x, Dx[,i], Ex[,i], mx[,i], 
-                                    qx[,i], lx[,i], dx[,i], sex, lx0))
+                                    qx[,i], lx[,i], dx[,i], sex, lx0, ax))
       LTname <- if (is.na(X$LTnames[i])) i else  X$LTnames[i]
-      LTi <- cbind(LT = LTname, LTi)
-      LT  <- rbind(LT, LTi)
+      LTi    <- cbind(LT = LTname, LTi)
+      LT     <- rbind(LT, LTi)
     }
   }
   
@@ -104,7 +108,7 @@ LifeTable <- function(x, Dx = NULL, Ex = NULL, mx = NULL,
 #' @inheritParams LifeTable
 #' @keywords internal
 #' @export
-LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0){
+LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0, ax){
   my.case  <- find.my.case(Dx, Ex, mx, qx, lx, dx)$case
   gr_names <- paste0("[", x,",", c(x[-1], "+"), ")")
   N        <- length(x)
@@ -145,8 +149,13 @@ LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0){
     mx <- mx_qx(x, qx, out = "mx")
   }
   
-  ax    <- compute.ax(x, mx, qx) 
-  if (!is.null(sex)) ax <- coale.demeny.ax(x, mx, ax, sex)
+  if (is.null(ax)) {
+    ax <- compute.ax(x, mx, qx) 
+    if (!is.null(sex)) ax <- coale.demeny.ax(x, mx, ax, sex)
+  } else {
+    ax <- rep(ax, N)
+  }
+  
   Lx    <- nx*lx - (nx - ax)*dx
   Lx[N] <- ax[N]*dx[N]
   Lx[is.na(Lx)] <- 0
@@ -297,20 +306,24 @@ LifeTable.check <- function(input) {
     }
     if (C == "C2_mx") {
       if (any(is.na(mx))) {
-        warning(paste("'mx'", SMS1, SMS2, "maximum observed mx:", max(mx, na.rm = T)), call. = F)
+        warning(paste("'mx'", SMS1, SMS2, "maximum observed mx:", 
+                      max(mx, na.rm = T)), call. = F)
         mx[is.na(mx)] <- max(mx, na.rm = T)
       }
     }
     if (C == "C3_qx") {
       c1 <- is.na(qx[length(qx)])
-      c2 <- is.na(qx[x >= 100])
-      if (any(c1)) {
-        warning(paste("ultimate 'qx' is NA. It is replaces with 1."), call. = F)
-        qx[length(qx)] <- 1
-      }
+      n  <- length(qx)
+      c2 <- is.na(qx[-n][x[-n] >= 100])
       if (any(c2)) {
-        warning(paste("'qx'", SMS1, SMS2, max(qx, na.rm = T)), call. = F)
-        qx[is.na(qx) & x >= 100] <- max(qx, na.rm = T)
+        warning(paste("'qx' contains several missing values over the age of 100.",
+                      "NA's were replaced with", round(max(qx, na.rm = T)[1], 4)), 
+                call. = F)
+        qx[is.na(qx) & x >= 100] <- max(qx, na.rm = T)[1]
+      }
+      if (any(c1)) {
+        warning(paste("'qx' ultimate is NA. It is replaces with 1."), call. = F)
+        qx[length(qx)] <- 1
       }
     }
     if (C == "C4_lx") {
@@ -321,8 +334,14 @@ LifeTable.check <- function(input) {
       if (any(is.na(dx))) warning(paste("'dx'", SMS1, SMS2, 0), call. = F)
       dx[is.na(dx)] <- 0
     }
+    
+    if (!is.null(ax)) {
+      if (!is.numeric(ax)) stop("'ax' must be a numeric scalar (or NULL)", call. = F)
+      if (length(ax) != 1) stop("Provide a single values for 'ax'", call. = F)
+    }
+    
     out <- list(x = x, Dx = Dx, Ex = Ex, mx = mx, qx = qx, 
-                lx = lx, dx = dx, sex = sex, lx0 = lx0, 
+                lx = lx, dx = dx, sex = sex, lx0 = lx0, ax = ax,
                 iclass = Y$iclass, nLT = Y$nLT, LTnames = Y$LTnames)
     return(out)
   })
