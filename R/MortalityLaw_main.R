@@ -59,6 +59,9 @@
 #' AIC, BIC and log-Likelihood} 
 #' @return \item{opt.diagnosis}{Resulted optimization object useful for 
 #' checking the convergence etc.} 
+#' @return \item{stats}{List containing statistical measures like: 
+#' parameter correlation, standard errors, degrees of freedom, deviance, 
+#' gradient matrix, QR decomposition, covariance matrix etc.} 
 #' @examples
 #' # Example 1: ---
 #' # Fit Makeham Model for Year of 1950.
@@ -133,8 +136,8 @@
 #' @export
 MortalityLaw <- function(x, Dx = NULL, Ex = NULL, mx = NULL, qx = NULL, 
                          law = NULL, opt.method = 'poissonL', parS = NULL, 
-                         fit.this.x = x, scale.x = FALSE, 
-                         custom.law = NULL, show = TRUE){
+                         fit.this.x = x, scale.x = FALSE, custom.law = NULL, 
+                         show = TRUE){
   if (!is.null(custom.law)) {
     law  <- 'custom.law'
     parS <- custom.law(1)$par 
@@ -150,17 +153,22 @@ MortalityLaw <- function(x, Dx = NULL, Ex = NULL, mx = NULL, qx = NULL,
     optim.model <- choose_optim(input) 
     if (show) setpb(pb, 2)
     
-    fit   <- optim.model$hx
-    gof   <- with(optim.model, c(logLik = logLik, AIC = AIC, BIC = BIC))
-    dgn   <- optim.model$opt #diagnosis
-    cf    <- exp(dgn$par) 
-    resid <- switch(C, C1_DxEx = Dx/Ex - fit,
-                       C2_mx = mx - fit,
-                       C3_qx = qx - fit)
+    fit    <- optim.model$hx
+    dgn    <- optim.model$opt #diagnosis
+    cf     <- exp(dgn$par)
+    p      <- length(cf)
+    resid  <- switch(C, C1_DxEx = Dx/Ex - fit,
+                     C2_mx = mx - fit,
+                     C3_qx = qx - fit)
+    dev    <- sum(resid^2)
+    rdf    <- length(x) - p
+    df     <- c(n.param = p, df.residual = rdf)
+    gof    <- with(optim.model, c(logLik = logLik, AIC = AIC, BIC = BIC))
     if (show) setpb(pb, 3)
+    
     # Prepare, arrange, customize output
     if (law == "custom.law") {
-      model.info <- "CUSTOM MORTALITY LAW"
+      model.info <- "Custom Mortality Law"
     } else {
       availLaws  <- availableLaws()$table
       model.info <- data.frame(availLaws[availLaws$CODE == law, ], row.names = "")    
@@ -172,26 +180,27 @@ MortalityLaw <- function(x, Dx = NULL, Ex = NULL, mx = NULL, qx = NULL,
   } else {
     N  <- FMC$nLT
     if (show) {pb <- startpb(0, N + 1); on.exit(closepb(pb))} # Set progress bar
-    cf = fit = gof = resid = dgn <- NULL
+    cf = fit = gof = resid = dgn = df = dev <- NULL
     for (i in 1:N) {
       if (show) setpb(pb, i)
       M <- suppressMessages(MortalityLaw(x, Dx[, i], Ex[, i], mx[, i], qx[, i], 
-            law, opt.method, parS, fit.this.x, scale.x, custom.law, show = FALSE))
+          law, opt.method, parS, fit.this.x, scale.x, custom.law, show = FALSE))
       fit      <- cbind(fit, fitted(M))
       gof      <- rbind(gof, M$goodness.of.fit)
       dgn[[i]] <- M$dgn
       cf       <- rbind(cf, coef(M))
-      resid    <- cbind(resid, M$residuals)
-      info     <- M$info
+      resid    <- cbind(resid, resid(M))
+      df       <- rbind(df, M$df)
+      dev      <- c(dev, M$dev)
     }
-    rownames(cf)  = rownames(gof)   <- FMC$LTnames
+    info <- M$info
+    rownames(cf)  = rownames(gof) = rownames(df) = names(dev) <- FMC$LTnames
     dimnames(fit) = dimnames(resid) <- list(x, FMC$LTnames)
     if (show) setpb(pb, N + 1)
   }
-  
   output <- list(input = input, info = info, coefficients = cf,
-                 fitted.values = fit, residuals = resid,
-                 goodness.of.fit = gof, opt.diagnosis = dgn)
+                 fitted.values = fit, residuals = resid, 
+                 goodness.of.fit = gof, opt.diagnosis = dgn, df = df, deviance = dev)
   output$info$call <- match.call()
   out <- structure(class = "MortalityLaw", output)
   return(out)
@@ -233,6 +242,12 @@ objective_fun <- function(par, x, Dx, Ex, mx, qx,
   return(out)
 }
 
+#' Scaling method for x vector
+#' @inheritParams MortalityLaw
+#' @keywords internal
+scale_x <- function(x) {
+  x - min(x) + 1
+}
 
 #' Select an optimizing method
 #' @param input list of all inputs collected from MortalityLaw function
@@ -241,8 +256,8 @@ choose_optim <- function(input){
   with(as.list(input), {
     # Subset the data
     if (scale.x) {
-      x <- x - min(x) + 1 
-      fit.this.x <- fit.this.x - min(fit.this.x) + 1
+      x <- scale_x(x)
+      fit.this.x <- scale_x(fit.this.x)
     }
     select.x <- x %in% fit.this.x
     qx       <- qx[select.x]
@@ -270,7 +285,7 @@ choose_optim <- function(input){
     cf     <- exp(opt$par)
     hx     <- do.call(law, list(x = x, par = cf))$hx
     logLik <- log(opt$fnvalue)
-    AIC    <- 2*length(parS) - 2 * logLik
+    AIC    <- 2 * length(parS) - 2 * logLik
     BIC    <- log(length(fit.this.x)) * length(parS) - 2 * logLik
     
     if (!(opt.method %in% c('poissonL', 'binomialL'))) { 
@@ -283,185 +298,8 @@ choose_optim <- function(input){
 
 
 
-#' Function to check input data in MortalityLaw
-#' @inheritParams choose_optim
-#' @keywords internal
-#' 
-check.MortalityLaw <- function(input){
-  with(input, 
-       {
-         # Errors ---
-         if (!is.logical(show)) stop("'show' should be TRUE or FALSE")
-         
-         if (!is.null(mx)) {
-           if (length(x) != length(mx)) 
-             stop('x and mx do not have the same length!', call. = FALSE)
-         }
-         
-         if (!is.null(Dx)) {
-           if (length(x) != length(Dx) | length(x) != length(Ex) ) 
-             stop('x, Dx and Ex do not have the same length!', call. = FALSE)
-         }
-         
-         models <- c(as.matrix(availableLaws()$table[, 5]), 'custom.law')
-         if ( !(law %in% models)) {
-           m1 <- 'Mortality law not available. Check one of the following models:\n'
-           err1 <- paste(m1, paste(models, collapse = ', '))
-           stop(err1, call. = FALSE)
-         }
-         
-         function_to_optimize <- availableLF()$table[, 'CODE']
-         if (!(opt.method %in% function_to_optimize)) {
-           m1 <- 'Choose a different objective function to optimize\n'
-           m2 <- 'Check one of the following options:\n'
-           err2 <- paste(m1, m2, paste(function_to_optimize, collapse = ', '))
-           stop(err2, call. = FALSE)
-         }
-         if (length(fit.this.x) <= 5) {
-           stop(paste("'More observations needed in order to start the fitting.",
-                      " Increase the length of 'fit.this.x'"), call. = F)
-         }
-         if (!all(fit.this.x %in% x)) {
-           stop("'fit.this.x' should be a subset of 'x'", call. = F)
-         }
-         # Warnings ---
-         if (min(x) > 1 & (!scale.x)) {
-           warning("\nScale down the 'x' argument so that is begins with a small value. ",
-                   "Set 'scale.x = TRUE'. This is useful in order to obtain meaningful ", 
-                   "estimates and in some cases a better fit (e.g. 'kannisto' law).", 
-                   call. = F)
-         }
-         
-         # Messages ---
-         if (law %in% c('HP', 'HP2', 'HP3', 'HP4', 'kostaki') & opt.method != "LF2") {
-           message(paste("\nFor cases like", law, "the optimization method 'LF2'",
-                         "has been observed to return reliable estimates."))
-         }
-       })
-}
 
 
-#' Print MortalityLaw
-#' @param x an object of class \code{"MortalityLaw"}
-#' @param ... further arguments passed to or from other methods.
-#' @keywords internal
-#' @export
-print.MortalityLaw <- function(x, ...) {
-  L <- x$input$law == "custom.law"
-  info <- if (L) "CUSTOM MORTALITY LAW" else as.matrix(x$info$model.info[, c(2, 3)])
-  cat(paste(info, collapse = ':\n'))
-  fv <- ifelse(!is.null(x$input$qx), 'qx', 'mx')
-  cat("\n\nFitted values:", fv, "\n")
-}
 
 
-#' Summary MortalityLaw
-#' @param x an object of class \code{"MortalityLaw"}
-#' @param ... additional arguments affecting the summary produced.
-#' @keywords internal
-#' @export
-summary.MortalityLaw <- function(object, ...) {
-  law  <- object$input$law
-  if (law == "custom.law") {
-    mi <- "CUSTOM MORTALITY LAW"
-  } else {
-    mi <- as.matrix(object$info$model.info[, c(2, 3)])
-  }
-  call <- object$info$call
-  res  <- round(summary(as.vector(as.matrix(object$residuals))), 5)
-  fv   <- ifelse(!is.null(object$input$qx), 'qx', 'mx')
-  cf   <- round(coef(object), 5)
-  opt  <- object$input$opt.method
-  gof  <- round(object$goodness.of.fit, 3)
-  
-  if (!is.null(nrow(cf))) {
-    if (nrow(cf) > 4) {
-      cf  <- head_tail(cf, hlength = 2, tlength = 2)
-      gof <- head_tail(gof, hlength = 2, tlength = 2)
-    }
-  }   
-  out  <- list(info = mi, call = call, opt.method = opt, goodness.of.fit = gof, 
-               coefficients = cf, fv = fv, dev.resid = res)
-  out  <- structure(class = "summary.MortalityLaw", out)
-  return(out)
-}
-
-
-#' Print summary.MortalityLaw
-#' @param x an object of class \code{"summary.MortalityLaw"}
-#' @param ... additional arguments affecting the summary produced.
-#' @keywords internal
-#' @export
-print.summary.MortalityLaw <- function(x, ...) {
-  cat(paste(x$info, collapse = ':\n'))
-  cat("\n\nCall: ")
-  print(x$call)
-  cat('\nDeviance Residuals:\n')
-  print(x$dev.resid)
-  cat('\nFitted values:', x$fv)
-  cat('\nCoefficients:\n')
-  print(x$coefficients)
-  if (x$opt.method %in% c("poissonL", "binomialL")) {
-    cat('\nGoodness of fit:\n')
-    print(x$goodness.of.fit)
-  }
-}
-
-
-#' logLik function for MortalityLaw
-#' @inheritParams print.MortalityLaw
-#' @keywords internal
-#' @export
-logLik.MortalityLaw <- function(object, ...) {
-  c(object$goodness.of.fit["logLik"])
-}
-
-#' AIC function for MortalityLaw
-#' @inheritParams print.MortalityLaw
-#' @keywords internal
-#' @export
-AIC.MortalityLaw <- function(object, ...) {
-  c(object$goodness.of.fit["AIC"])
-}
-
-
-#' Predict function for MortalityLaw
-#' @param object An object of class \code{"MortalityLaw"}
-#' @param x Vector of ages to be considered in prediction
-#' @param ... Additional arguments affecting the predictions produced.
-#' @seealso \code{\link{MortalityLaw}}
-#' @examples 
-#' # See complete example in MortalityLaw help page
-#' @export
-predict.MortalityLaw <- function(object, x, ...){
-  sx <- object$input$scale.x
-  xi <- object$input$x
-  
-  if (sx & min(x) < min(xi)) {
-    stop(paste("When the mortality model is estimated using 'scale.x = TRUE'", 
-         "the predicted 'x' must be higher that 'x' used in fitting.",
-         "Provide values equal or greater than", min(xi)), call. = F)
-  }
-  if (min(x) < 0) stop("'x' must be greater or equal to zero.", call. = F)
-  
-  x_  <- if (sx) x - min(xi) + 1 else x
-  law <- object$input$law
-  Par <- coef(object)
-  pn  <- names(Par)
-  Par <- if (is.matrix(Par)) Par else matrix(Par, nrow = 1)
-  
-  if (law == "custom.law") {
-    colnames(Par) <- pn
-    M  <- object$input$custom.law
-    hx <- apply(X = Par, 1, FUN = function(X) M(x = x_, par = X)$hx)
-  } else {
-    hx <- apply(X = Par, 1, FUN = function(X) eval(call(law, x = x_, par = X))$hx)
-  }
-  rownames(hx) <- x
-  if (ncol(hx) == 1) {
-    hx <- as.numeric(hx)
-    names(hx) <- x
-  }
-  return(hx)
-}
 
