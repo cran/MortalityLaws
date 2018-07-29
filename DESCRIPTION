@@ -1,7 +1,8 @@
 Package: MortalityLaws
 Type: Package
 Title: Parametric Mortality Models, Life Tables and HMD
-Version: 1.4.0
+Version: 1.5.0
+Date: 2018-07-29
 Authors@R: c(
   person("Marius D.", "Pascariu", role = c("aut", "cre"), 
          email = "mpascariu@outlook.com"),
@@ -14,7 +15,7 @@ Description: Fit the most popular human mortality 'laws', and construct
   life spans. For a comprehensive review of the most important mortality 
   laws see Tabeau (2001) <doi:10.1007/0-306-47562-6_1>. 
   An elegant function for downloading data from Human Mortality 
-  Database <http://www.mortality.org> is provided as well.  
+  Database <https://www.mortality.org> is provided as well.  
 License: GPL-3
 LazyData: TRUE
 Depends: R (>= 3.0.0)
@@ -25,8 +26,8 @@ BugReports: https://github.com/mpascariu/MortalityLaws/issues
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2018-06-20 07:10:26 UTC; mpascariu
+Packaged: 2018-07-29 13:56:13 UTC; mpascariu
 Author: Marius D. Pascariu [aut, cre],
   Vladimir Canudas-Romo [ctb]
 Repository: CRAN
-Date/Publication: 2018-06-20 07:29:12 UTC
+Date/Publication: 2018-07-29 14:20:03 UTC

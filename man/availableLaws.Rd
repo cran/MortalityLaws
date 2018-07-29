@@ -7,20 +7,21 @@
 availableLaws(law = NULL)
 }
 \arguments{
-\item{law}{Optional. Default: \code{NULL}. One can subtract details about 
+\item{law}{Optional. Default: \code{NULL}. One can extract details about 
 a certain model by specifying its codename.}
 }
 \value{
-The output is of \code{"availableLaws"} class with the components:
+The output is of the \code{"availableLaws"} class with the components:
 
 \item{table}{Table with mortality models and codes to be used in \code{\link{MortalityLaw}}}
 
 \item{legend}{Table with details about the section of the mortality curve }
 }
 \description{
-The function returns information about the parametric models that can be called and fitted
-in \code{\link{MortalityLaw}} function. For a comprehensive review of the 
-most important mortality laws Tabeau (2001) is a good starting point.
+The function returns information about the parametric models that can be 
+called and fitted in the \code{\link{MortalityLaw}} function. 
+For a comprehensive review of the most important mortality laws, 
+Tabeau (2001) is a good starting point.
 }
 \examples{
 

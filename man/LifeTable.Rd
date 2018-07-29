@@ -2,7 +2,7 @@
 % Please edit documentation in R/LifeTable.R
 \name{LifeTable}
 \alias{LifeTable}
-\title{Life Table Function}
+\title{Compute Life Tables from Mortality Data}
 \usage{
 LifeTable(x, Dx = NULL, Ex = NULL,
              mx = NULL,
@@ -16,7 +16,7 @@ LifeTable(x, Dx = NULL, Ex = NULL,
 \arguments{
 \item{x}{Vector of ages at the beginning of the age interval.}
 
-\item{Dx}{Object containing death counts. An element of the \code{Dx} object, 
+\item{Dx}{Object containing death counts. An element of the \code{Dx} object 
 represents the number of deaths during the year to persons aged x to x+n.}
 
 \item{Ex}{Exposure in the period. \code{Ex} can be approximated by the 
@@ -26,13 +26,13 @@ mid-year population aged x to x+n.}
 
 \item{qx}{Probability of dying in age interval [x, x+n).}
 
-\item{lx}{Probability to survive up until age x.}
+\item{lx}{Probability of survival up until age x.}
 
-\item{dx}{Deaths by life-table population in age interval [x, x+n).}
+\item{dx}{Deaths by life-table population in the age interval [x, x+n).}
 
 \item{sex}{Sex of the population considered here. Default: \code{NULL}. 
 This argument affects the first two values in the life table ax column. 
-If sex is specified the values are computed based on Coale-Demeny method 
+If sex is specified the values are computed based on the Coale-Demeny method 
 and are slightly different for males than for females. 
 Options: \code{NULL, male, female, total}.}
 
@@ -44,7 +44,7 @@ assumption is \code{ax = 0.5}, i.e. the deaths occur in the middle of
 the interval. Default: \code{NULL}.}
 }
 \value{
-The output is of class \code{LifeTable} with the components:
+The output is of the \code{"LifeTable"} class with the components:
 
 \item{lt}{Computed life table;}
 
@@ -54,15 +54,19 @@ specified by their full names;}
 \item{process_date}{Time stamp.}
 }
 \description{
-Construct either a full or abridge life table with various input choices like:
+Construct either a full or abridged life table with various input choices like:
 death counts and mid-interval population estimates \code{(Dx, Ex)} or 
 age-specific death rates \code{(mx)} or death probabilities \code{(qx)}
 or survivorship curve \code{(lx)} or a distribution of deaths \code{(dx)}.
-If one of these options are specified, the other can be ignored.
+If one of these options is specified, the other can be ignored. The input 
+data can be an object of class: numerical \code{vector}, \code{matrix} or 
+\code{data.frame}.
 }
 \details{
-The input data can be of an object of class: 
-\code{numeric}, \code{matrix} or \code{data.frame}.
+The "life table" is also called "mortality table" or "actuarial table".
+This shows, for each age, what the probability is that a person of that 
+age will die before his or her next birthday, the expectation of life across 
+different age ranges or the survivorship of people from a certain population.
 }
 \examples{
 # Example 1 --- Full life tables with different inputs ---
@@ -89,7 +93,7 @@ LTs
 # A warning is printed if the input contains missing values. 
 # Some of the missing values can be handled by the function.
 
-# Example 3 --- Abridge life table ------------
+# Example 3 --- Abridged life table ------------
 
 x  = c(0, 1, seq(5, 110, by = 5))
 mx = c(.053, .005, .001, .0012, .0018, .002, .003, .004, 

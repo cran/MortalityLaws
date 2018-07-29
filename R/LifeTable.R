@@ -1,13 +1,18 @@
-#' Life Table Function
+#' Compute Life Tables from Mortality Data
 #' 
-#' Construct either a full or abridge life table with various input choices like:
+#' Construct either a full or abridged life table with various input choices like:
 #' death counts and mid-interval population estimates \code{(Dx, Ex)} or 
 #' age-specific death rates \code{(mx)} or death probabilities \code{(qx)}
 #' or survivorship curve \code{(lx)} or a distribution of deaths \code{(dx)}.
-#' If one of these options are specified, the other can be ignored.
-#'  
-#' @details The input data can be of an object of class: 
-#' \code{numeric}, \code{matrix} or \code{data.frame}.
+#' If one of these options is specified, the other can be ignored. The input 
+#' data can be an object of class: numerical \code{vector}, \code{matrix} or 
+#' \code{data.frame}.
+#' 
+#' @details 
+#' The "life table" is also called "mortality table" or "actuarial table".
+#' This shows, for each age, what the probability is that a person of that 
+#' age will die before his or her next birthday, the expectation of life across 
+#' different age ranges or the survivorship of people from a certain population.
 #' @usage 
 #' LifeTable(x, Dx = NULL, Ex = NULL,
 #'              mx = NULL,
@@ -18,17 +23,17 @@
 #'              lx0 = 1e+05,
 #'              ax  = NULL)
 #' @param x Vector of ages at the beginning of the age interval.
-#' @param Dx Object containing death counts. An element of the \code{Dx} object, 
+#' @param Dx Object containing death counts. An element of the \code{Dx} object 
 #' represents the number of deaths during the year to persons aged x to x+n. 
 #' @param Ex Exposure in the period. \code{Ex} can be approximated by the 
 #' mid-year population aged x to x+n.
 #' @param mx Death rate in age interval [x, x+n).
 #' @param qx Probability of dying in age interval [x, x+n).
-#' @param lx Probability to survive up until age x.
-#' @param dx Deaths by life-table population in age interval [x, x+n).
+#' @param lx Probability of survival up until age x.
+#' @param dx Deaths by life-table population in the age interval [x, x+n).
 #' @param sex Sex of the population considered here. Default: \code{NULL}. 
 #' This argument affects the first two values in the life table ax column. 
-#' If sex is specified the values are computed based on Coale-Demeny method 
+#' If sex is specified the values are computed based on the Coale-Demeny method 
 #' and are slightly different for males than for females. 
 #' Options: \code{NULL, male, female, total}.
 #' @param lx0 Radix. Default: 100 000.
@@ -36,7 +41,7 @@
 #' die in the same interval. If \code{NULL} this will be estimated. A common 
 #' assumption is \code{ax = 0.5}, i.e. the deaths occur in the middle of 
 #' the interval. Default: \code{NULL}.
-#' @return The output is of class \code{LifeTable} with the components:
+#' @return The output is of the \code{"LifeTable"} class with the components:
 #' @return \item{lt}{Computed life table;}
 #' @return \item{call}{\code{Call} in which all of the specified arguments are 
 #' specified by their full names;}
@@ -66,7 +71,7 @@
 #' # A warning is printed if the input contains missing values. 
 #' # Some of the missing values can be handled by the function.
 #' 
-#' # Example 3 --- Abridge life table ------------
+#' # Example 3 --- Abridged life table ------------
 #' 
 #' x  = c(0, 1, seq(5, 110, by = 5))
 #' mx = c(.053, .005, .001, .0012, .0018, .002, .003, .004, 
@@ -89,7 +94,7 @@ LifeTable <- function(x, Dx = NULL, Ex = NULL, mx = NULL,
   } else {
     for (i in 1:X$nLT) {
       LTi <- with(X, LifeTable.core(x, Dx[,i], Ex[,i], mx[,i], 
-                     qx[,i], lx[,i], dx[,i], sex, lx0, ax))
+                                    qx[,i], lx[,i], dx[,i], sex, lx0, ax))
       LTn <- if (is.na(X$LTnames[i])) i else  X$LTnames[i]
       LTi <- cbind(LT = LTn, LTi)
       LT  <- rbind(LT, LTi)
@@ -159,7 +164,7 @@ LifeTable.core <- function(x, Dx, Ex, mx, qx, lx, dx, sex, lx0, ax){
   Lx[N] <- ax[N]*dx[N]
   Lx[is.na(Lx)] <- 0
   Tx    <- rev(cumsum(rev(Lx)))
-  ex    <- Tx/lx  # life expectancy at the begining of the interval $e^{0}_x$
+  ex    <- Tx/lx  # life expectancy at the beginning of the interval $e^{0}_x$
   # ex  <- Tx/(lx - dx*(ax/nx)) # life expectancy in the interval $e_x$
   ex[is.na(ex)] <- 0
   ex[N] <- if (ex[N - 1] == 0) 0 else ax[N]
@@ -354,8 +359,8 @@ LifeTable.check <- function(input) {
 }
 
 #' Print LifeTable
-#' @param x an object of class \code{"LifeTable"}
-#' @param ... further arguments passed to or from other methods.
+#' @param x An object of class \code{"LifeTable"}
+#' @param ... Further arguments passed to or from other methods.
 #' @keywords internal
 #' @export
 print.LifeTable <- function(x, ...){
@@ -371,7 +376,7 @@ print.LifeTable <- function(x, ...){
   out   <- head_tail(lt, hlength = 6, tlength = 3, ...)
   step  <- diff(LT$x)
   step  <- step[step > 0]
-  type1 <- if (all(step == 1)) "Full" else "Abridge"
+  type1 <- if (all(step == 1)) "Full" else "Abridged"
   type2 <- if (nlt == 1) "Life Table" else "Life Tables"
   
   cat("\n", type1, " ", type2, "\n\n", sep = "")
@@ -380,3 +385,5 @@ print.LifeTable <- function(x, ...){
   cat("Age intervals:", head_tail(lt$x.int, hlength = 3, tlength = 3), "\n\n")
   print(out, row.names = FALSE)
 } 
+
+
