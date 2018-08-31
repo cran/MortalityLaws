@@ -114,35 +114,38 @@ df.residual.MortalityLaw <- function(object, ...) {
 #' @param x Vector of ages to be considered in prediction
 #' @param ... Additional arguments affecting the predictions produced.
 #' @seealso \code{\link{MortalityLaw}}
+#' @author Marius D. Pascariu
 #' @examples 
 #' # Extrapolate old-age mortality with the Kannisto model
 #' # Fit ages 80-94 and extrapolate up to 120.
 #' 
 #' Mx <- ahmd$mx[paste(80:94), "1950"]
-#' M1 <- MortalityLaw(x = 80:94, mx  = Mx, law = 'kannisto', scale.x = TRUE)
+#' M1 <- MortalityLaw(x = 80:94, mx  = Mx, law = 'kannisto')
 #' fitted(M1)
 #' predict(M1, x = 80:120)
 #' 
 #' # See more examples in MortalityLaw function help page.
 #' @export
 predict.MortalityLaw <- function(object, x, ...){
-  sx <- object$input$scale.x
-  xi <- object$input$x
-  
-  if (sx & min(x) < min(xi)) {
-    stop(paste("When the mortality model is estimated using 'scale.x = TRUE'", 
-               "the predicted 'x' must be higher that 'x' used in fitting.",
-               "Provide values equal or greater than", min(xi)), call. = F)
-  }
   if (min(x) < 0) stop("'x' must be greater or equal to zero.", call. = F)
+  law   <- object$input$law
+  sx    <- object$input$scale.x
+  new.x <- x
   
-  x_  <- if (sx) x - min(xi) + 1 else x
-  law <- object$input$law
+  if (sx) {
+    fit.this.x <- object$input$fit.this.x
+    d <- fit.this.x[1] - scale_x(fit.this.x)[1]
+    new.x <- x - d
+  }
+  
   Par <- coef(object)
-  pn  <- names(Par)
-  Par <- if (is.matrix(Par)) Par else matrix(Par, nrow = 1, dimnames = list("", pn))
-  M   <- if (law == "custom.law") object$input$custom.law else get(law)
-  hx  <- apply(X = Par, 1, FUN = function(X) M(x = x_, par = X)$hx)
+  
+  if (!is.matrix(Par)) {
+    Par <- matrix(Par, nrow = 1, dimnames = list("", names(Par)))
+  }
+  
+  fn <- if (law == "custom.law") object$input$custom.law else get(law)
+  hx <- apply(X = Par, 1, FUN = function(X) fn(x = new.x, par = X)$hx)
   rownames(hx) <- x
   
   if (ncol(hx) == 1) {

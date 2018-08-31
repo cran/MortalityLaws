@@ -28,22 +28,18 @@ for free on the Human Mortality Database website.}
 
 \item{password}{Your HMD password.}
 
-\item{save}{Do you want to save a copy of the dataset on your local machine?}
+\item{save}{Do you want to save a copy of the dataset on your local machine? 
+Logical. Default: \code{FALSE}.}
 
 \item{show}{Choose whether to display a progress bar. Logical. Default: \code{TRUE}.}
 }
 \value{
 A \code{ReadHMD} object that contains:
-
-\item{input}{List with the input values (except the password).}
-
-\item{data}{Data downloaded from HMD.}
-
-\item{download.date}{Time stamp.}
-
-\item{years}{Numerical vector with the years covered in the data.}
-
-\item{ages}{Numerical vector with ages covered in the data.}
+ \item{input}{List with the input values (except the password).}
+ \item{data}{Data downloaded from HMD.}
+ \item{download.date}{Time stamp.}
+ \item{years}{Numerical vector with the years covered in the data.}
+ \item{ages}{Numerical vector with ages covered in the data.}
 }
 \description{
 Download detailed mortality and population data for different countries 
@@ -78,4 +74,7 @@ LTF <- ReadHMD(what = "LT_f",
                save = TRUE)
 LTF
 } 
+}
+\author{
+Marius D. Pascariu
 }

@@ -6,12 +6,11 @@
 \usage{
 MortalityLaw(x, Dx = NULL, Ex = NULL, mx = NULL, qx = NULL, 
                 law = NULL, 
-                opt.method = "poissonL", 
+                opt.method = "LF2", 
                 parS = NULL, 
                 fit.this.x = x,
-                scale.x = FALSE,
                 custom.law = NULL, 
-                show = TRUE)
+                show = FALSE, ...)
 }
 \arguments{
 \item{x}{Vector of ages at the beginning of the age interval.}
@@ -42,36 +41,26 @@ function.}
 \code{fit.this.x = x}. One may want to exclude from the fitting procedure, say, the 
 advanced ages where the data is sparse.}
 
-\item{scale.x}{Logical. Scale down \code{"x"} vector so that it begins with 
-a small value. This is useful in order to obtain meaningful estimates and 
-sometimes a better fit. Default: \code{FALSE}. Method: \code{new.x = x - min(x) + 1}.}
-
 \item{custom.law}{Allows you to fit a model that is not defined 
 in the package. Accepts as input a function.}
 
 \item{show}{Choose whether to display a progress bar during the fitting process. 
-Logical. Default: \code{TRUE}.}
+Logical. Default: \code{FALSE}.}
+
+\item{...}{Arguments to be passed to or from other methods.}
 }
 \value{
 The output is of the \code{"MortalityLaw"} class with the components:
-
-\item{input}{List with arguments provided in input. Saved for convenience.}
-
-\item{info}{Brief information about the model.}
-
-\item{coefficients}{Estimated coefficients.}
-
-\item{fitted.values}{Fitted values of the selected model.}
-
-\item{residuals}{Deviance residuals.}
-
-\item{goodness.of.fit}{List containing goodness of fit measures like 
-AIC, BIC and log-Likelihood.}
-
-\item{opt.diagnosis}{Resultant optimization object useful for 
-checking the convergence etc.}
-
-\item{stats}{List containing statistical measures like: 
+ \item{input}{List with arguments provided in input. Saved for convenience.}
+ \item{info}{Brief information about the model.}
+ \item{coefficients}{Estimated coefficients.}
+ \item{fitted.values}{Fitted values of the selected model.}
+ \item{residuals}{Deviance residuals.} 
+ \item{goodness.of.fit}{List containing goodness of fit measures like 
+AIC, BIC and log-Likelihood.} 
+ \item{opt.diagnosis}{Resultant optimization object useful for 
+checking the convergence etc.} 
+ \item{stats}{List containing statistical measures like: 
 parameter correlation, standard errors, degrees of freedom, deviance, 
 gradient matrix, QR decomposition, covariance matrix etc.}
 }
@@ -80,7 +69,8 @@ Fit parametric mortality models given a set of input data which can be
 represented by death counts and mid-interval population estimates \code{(Dx, Ex)}
 or age-specific death rates \code{(mx)} or death probabilities \code{(qx)}. 
 Using the argument \code{law} one can specify the model to be fitted. 
-So far 27 parametric models have been implemented; check the \code{\link{availableLaws}}
+So far more than 27 parametric models have been implemented; 
+check the \code{\link{availableLaws}}
 function to learn about the available options. The models can be fitted under 
 the maximum likelihood methodology or by selecting a loss function to be 
 optimised. See the implemented loss function by running the
@@ -88,31 +78,27 @@ optimised. See the implemented loss function by running the
 }
 \details{
 Depending on the complexity of the model, one of following optimization 
-strategies is employed: 
-\enumerate{
-\item{Nelder-Mead method:}{ approximates a local optimum of a problem with n
- variables when the objective function varies smoothly and is unimodal. 
- For details see \code{\link{optim}}}
-\item{PORT routines:}{ provides unconstrained optimization and optimization 
-subject to box constraints for complicated functions. For details check 
-\code{\link{nlminb}}}
-\item{Levenberg-Marquardt algorithm:}{ damped least-squares method. 
-For details check \code{\link{nls.lm}}}
+strategies is employed: \enumerate{
+ \item{Nelder-Mead method:}{ approximates a local optimum of a problem with n
+  variables when the objective function varies smoothly and is unimodal. 
+  For details see \code{\link{optim}}}
+ \item{PORT routines:}{ provides unconstrained optimization and optimization 
+ subject to box constraints for complicated functions. For details check 
+ \code{\link{nlminb}}}
+ \item{Levenberg-Marquardt algorithm:}{ damped least-squares method. 
+ For details check \code{\link{nls.lm}}}
 }
 }
 \examples{
-# Example 1: ---
+# Example 1: --------------------------
 # Fit Makeham Model for Year of 1950.
 
 x  <- 45:75
 Dx <- ahmd$Dx[paste(x), "1950"]
 Ex <- ahmd$Ex[paste(x), "1950"]
 
-M1 <- MortalityLaw(x   = x, 
-                   Dx  = Dx, 
-                   Ex  = Ex, 
-                   law = 'makeham',
-                   scale.x = TRUE)
+M1 <- MortalityLaw(x = x, Dx = Dx, Ex = Ex, law = 'makeham')
+
 M1
 ls(M1)
 coef(M1)
@@ -122,21 +108,17 @@ predict(M1, x = 45:95)
 plot(M1)
 
 
-# Example 2: ---
+# Example 2: --------------------------
 # We can fit the same model using a different data format 
 # and a different optimization method.
 x  <- 45:75
 mx <- ahmd$mx[paste(x), ]
-M2 <- MortalityLaw(x   = x, 
-                   mx  = mx, 
-                   law = 'makeham', 
-                   opt.method = 'LF1', 
-                   scale.x = TRUE)
+M2 <- MortalityLaw(x = x, mx = mx, law = 'makeham', opt.method = 'LF1')
 M2
 fitted(M2)
 predict(M2, x = 55:90)
 
-# Example 3: ---
+# Example 3: --------------------------
 # Now let's fit a mortality law that is not defined 
 # in the package, say a reparameterized Gompertz in 
 # terms of modal age at death
@@ -149,32 +131,30 @@ my_gompertz <- function(x, par = c(b = 0.13, M = 45)){
   return(as.list(environment()))
 }
 
-M3 <- MortalityLaw(x  = x,
-                   Dx = Dx, 
-                   Ex = Ex, 
-                   custom.law = my_gompertz,
-                   scale.x = TRUE) 
+M3 <- MortalityLaw(x = x, Dx = Dx, Ex = Ex, custom.law = my_gompertz) 
 summary(M3)
 # predict M3 for different ages
 predict(M3, x = 85:130)
 
 
-# Example 4: ---
+# Example 4: --------------------------
 # Fit Heligman-Pollard model for a single 
 # year in the dataset between age 0 and 100 and build a life table.
 
 x  <- 0:100
 mx <- ahmd$mx[paste(x), "1950"] # select data
-M4 <- MortalityLaw(x   = x, 
-                   mx  = mx, 
-                   law = 'HP', 
-                   opt.method = 'LF2')
+M4 <- MortalityLaw(x = x, mx = mx, law = 'HP', opt.method = 'LF2')
 M4
 plot(M4)
 
 LifeTable(x = x, qx = fitted(M4))
 }
 \seealso{
-\code{\link{availableLaws}}, \code{\link{availableLF}}, 
-\code{\link{LifeTable}}, \code{\link{ReadHMD}}
+\code{\link{availableLaws}} 
+\code{\link{availableLF}}
+\code{\link{LifeTable}}
+\code{\link{ReadHMD}}
+}
+\author{
+Marius D. Pascariu
 }

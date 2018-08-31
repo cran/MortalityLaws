@@ -1,11 +1,10 @@
 Package: MortalityLaws
 Type: Package
 Title: Parametric Mortality Models, Life Tables and HMD
-Version: 1.5.0
-Date: 2018-07-29
+Version: 1.6.0
+Date: 2018-08-31
 Authors@R: c(
-  person("Marius D.", "Pascariu", role = c("aut", "cre"), 
-         email = "mpascariu@outlook.com"),
+  person("Marius D.", "Pascariu", role = c("aut", "cre", "cph"), email = "mpascariu@outlook.com", comment = c(ORCID = "0000-0002-2568-6489")),
   person("Vladimir", "Canudas-Romo", role = "ctb"))
 Maintainer: Marius D. Pascariu <mpascariu@outlook.com>
 Description: Fit the most popular human mortality 'laws', and construct 
@@ -19,15 +18,17 @@ Description: Fit the most popular human mortality 'laws', and construct
 License: GPL-3
 LazyData: TRUE
 Depends: R (>= 3.0.0)
-Imports: minpack.lm, RCurl, pbapply
-Suggests: testthat, knitr, rmarkdown, diagram
+Imports: minpack.lm (>= 1.2), RCurl (>= 1.95), pbapply (>= 1.3-4),
+        tidyr (>= 0.8.1)
+Suggests: testthat, knitr, rmarkdown
 URL: https://github.com/mpascariu/MortalityLaws
 BugReports: https://github.com/mpascariu/MortalityLaws/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2018-07-29 13:56:13 UTC; mpascariu
-Author: Marius D. Pascariu [aut, cre],
+Packaged: 2018-08-31 11:36:10 UTC; mpascariu
+Author: Marius D. Pascariu [aut, cre, cph]
+    (<https://orcid.org/0000-0002-2568-6489>),
   Vladimir Canudas-Romo [ctb]
 Repository: CRAN
-Date/Publication: 2018-07-29 14:20:03 UTC
+Date/Publication: 2018-08-31 12:00:03 UTC

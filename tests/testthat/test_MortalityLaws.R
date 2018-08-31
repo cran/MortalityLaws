@@ -61,35 +61,29 @@ Dx <- ahmd$Dx[paste(x), paste(yr)]
 Ex <- ahmd$Ex[paste(x), paste(yr)]
 T2 <- MortalityLaw(x = x - 44, Dx = Dx, Ex = Ex, law = 'makeham', fit.this.x = 50:70 - 44)
 testMortalityLaw(T2)
-expect_error(MortalityLaw(x = x, Dx = Dx, Ex = Ex, law = 'makeham', fit.this.x = 48:52))
+expect_error(MortalityLaw(x = x, Dx = Dx, Ex = Ex, law = 'makeham', fit.this.x = 48))
 expect_error(MortalityLaw(x = x, Dx = Dx, Ex = Ex, law = 'makeham', fit.this.x = 40:80))
 
 # Test 3: ---------------------------------------
 # custom.law
-x  <- 45:75
-Dx <- ahmd$Dx[paste(x), paste(yr)]
-Ex <- ahmd$Ex[paste(x), paste(yr)]
 my_gompertz <- function(x, par = c(b = 0.13, m = 45)){
   hx <- with(as.list(par), b*exp(b*(x - m)) )
   return(as.list(environment()))
 }
 
-expect_warning((T3 = MortalityLaw(x = x, Dx = Dx, Ex = Ex, custom.law = my_gompertz, scale.x = FALSE)))
+T3 = MortalityLaw(x = x, Dx = Dx, Ex = Ex, custom.law = my_gompertz)
 testMortalityLaw(T3)
 
 # test 4: ---------------------------------------
-# test for invalid laws and optimization methods
 mx  <- ahmd$mx[paste(0:100), 1] # select data
-expect_error(MortalityLaw(x = 0:100, mx = mx, law = 'law_not_available'))
-expect_error(MortalityLaw(x = 0:100, mx = mx, law = 'HP', opt.method = "LF_not_available"))
-expect_message((HP4 = MortalityLaw(x = 0:100, mx = mx, law = 'HP', 
-                                  opt.method = "poissonL")))
+expect_message((HP4 = MortalityLaw(x = 0:100, mx = mx, law = 'HP', opt.method = "poissonL")))
+
+expect_error(predict(HP4, x = -1:100))
 expect_true(is.numeric(AIC(HP4)))
 expect_true(is.numeric(logLik(HP4)))
 expect_true(is.numeric(df.residual(HP4)))
 expect_true(is.numeric(deviance(HP4)))
-
-expect_error(predict(M28, x = 60:100)) # kannisto
+expect_true(class(summary(HP4)) == "summary.MortalityLaw")
 
 # test 5: ---------------------------------------
 # Test that all the laws return positive values
@@ -101,6 +95,29 @@ for (i in laws) {
   expect_true(all(hx >= 0))
   expect_false(any(is.na(hx)))
 }
+
+# test 6: ---------------------------------------
+# Test error messages
+x <- 0:100
+mx <- ahmd$mx[paste(x), 1] # select data
+Dx = ahmd$Dx[paste(x), 1]
+Ex = ahmd$Ex[paste(x), 1]
+
+expect_error(MortalityLaw(x, mx = mx))
+expect_error(MortalityLaw(x, mx = mx, law = 'law_not_available'))
+expect_error(MortalityLaw(x, mx = mx, law = 'HP', opt.method = "LF_not_available"))
+expect_error(MortalityLaw(x, mx = mx, law = 'HP', show = "TRUEx"))
+expect_error(MortalityLaw(0:1000, mx = mx, law = 'HP'))
+expect_error(MortalityLaw(x, Dx = Dx, Ex = Ex[-1], law = 'HP'))
+expect_error(MortalityLaw(x, Dx = Dx[-1], Ex = Ex, law = 'HP'))
+
+
+
+
+
+
+
+
 
 
 

@@ -10,7 +10,7 @@ LifeTable(x, Dx = NULL, Ex = NULL,
              lx = NULL,
              dx = NULL,
              sex = NULL,
-             lx0 = 1e+05,
+             lx0 = 1e5,
              ax  = NULL)
 }
 \arguments{
@@ -45,13 +45,10 @@ the interval. Default: \code{NULL}.}
 }
 \value{
 The output is of the \code{"LifeTable"} class with the components:
-
-\item{lt}{Computed life table;}
-
-\item{call}{\code{Call} in which all of the specified arguments are 
-specified by their full names;}
-
-\item{process_date}{Time stamp.}
+ \item{lt}{Computed life table;}
+ \item{call}{\code{Call} in which all of the specified arguments are 
+ specified by their full names;}
+ \item{process_date}{Time stamp.}
 }
 \description{
 Construct either a full or abridged life table with various input choices like:
@@ -102,4 +99,11 @@ mx = c(.053, .005, .001, .0012, .0018, .002, .003, .004,
 lt = LifeTable(x, mx = mx, sex = "female")
 lt
 
+}
+\seealso{
+\code{\link{LawTable}}
+\code{\link{convertFx}}
+}
+\author{
+Marius D. Pascariu
 }
