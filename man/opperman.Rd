@@ -2,7 +2,7 @@
 % Please edit documentation in R/MortalityLaw_models.R
 \name{opperman}
 \alias{opperman}
-\title{Opperman Mortality Law}
+\title{Opperman Mortality Law - 1870}
 \usage{
 opperman(x, par = NULL)
 }
@@ -13,7 +13,7 @@ opperman(x, par = NULL)
 default values will be assigned automatically.}
 }
 \description{
-Opperman Mortality Law
+Opperman Mortality Law - 1870
 }
 \examples{
 opperman(x = 1:25)

@@ -12,7 +12,19 @@ names(mx) <- x1
 
 
 # ----------------------------------------------
-# GENERAL TEST
+# THE TEST
+# Here we would like to test what happens if the same model is fitted using 
+# data in different format. Let M1 and M2 be the 2 fitted objects. There
+# should be no difference between the estimates produced.
+
+M1 <- function() MortalityLaw(x = x1, mx = mx, law = law,
+                   fit.this.x = x2, opt.method = opt.method)
+M2 <- function() MortalityLaw(x = x2, mx = mx[paste(x2)], law = law,
+                   fit.this.x = x2, opt.method = opt.method)
+opt.method = "LF2"
+
+
+
 testFN <- function(M1, M2) {
   test_that(paste(law, "Model"), {
     expect_identical(fitted(M1)[paste(x2)], fitted(M2))
@@ -25,12 +37,6 @@ testFN <- function(M1, M2) {
   })
 }
 
-M1 <- function() MortalityLaw(x = x1, mx = mx, law = law,
-                   fit.this.x = x2, opt.method = opt.method)
-M2 <- function() MortalityLaw(x = x2, mx = mx[paste(x2)], law = law,
-                   fit.this.x = x2, opt.method = opt.method)
-
-opt.method = "LF2"
 
 # ----------------------------------------------
 # Test gompertz -- OK
@@ -112,6 +118,12 @@ x2 = seq(60, 95, by = 5)
 
 testFN(M1(), M2())
 # ----------------------------------------------
+# Test strehler_mildvan -- OK
+law = "strehler_mildvan"
+x2 = seq(40, 75, by = 5)
+
+testFN(M1(), M2())
+# ----------------------------------------------
 # Test quadratic -- OK
 law = "quadratic"
 x2 = seq(60, 95, by = 5)
@@ -124,8 +136,8 @@ x2 = seq(60, 95, by = 5)
 
 testFN(M1(), M2())
 # ----------------------------------------------
-# Test makehambeard -- OK
-law = "makehambeard"
+# Test beard_makeham -- OK
+law = "beard_makeham"
 x2 = seq(60, 95, by = 5)
 
 testFN(M1(), M2())
@@ -203,7 +215,12 @@ x2 = c(80, 85, 90, 95)
 
 testFN(M1(), M2())
 
+# ----------------------------------------------
+# Test kannisto_makeham -- OK
+law = "kannisto_makeham"
+x2 = c(80, 85, 90, 95)
 
+testFN(M1(), M2())
 
 
 
