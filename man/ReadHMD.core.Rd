@@ -4,11 +4,11 @@
 \alias{ReadHMD.core}
 \title{Function to Download Data for a one Country}
 \usage{
-ReadHMD.core(what, country, interval, username, password)
+ReadHMD.core(what, country, interval, username, password, link)
 }
 \arguments{
-\item{what}{What type of data are you looking for? The following options are 
-available: \itemize{
+\item{what}{What type of data are you looking for? The following options
+might be available for some or all the countries and regions: \itemize{
   \item{\code{"births"}} -- birth records;
   \item{\code{"Dx_lexis"}} -- deaths by Lexis triangles;
   \item{\code{"Ex_lexis"}} -- exposure-to-risk by Lexis triangles;
@@ -28,16 +28,25 @@ available: \itemize{
   \item{\code{"e0c"}} -- cohort life expectancy at birth;
   }}
 
-\item{country}{HMD country code for the selected country. Character.}
+\item{country}{HMD country code for the selected country. Character;}
 
-\item{interval}{HMD data format: (age interval x year interval).
-Interval options: \code{1x1}, \code{1x5}, \code{1x10}, 
-\code{5x1}, \code{5x5}, \code{5x10}.}
+\item{interval}{Datasets are given in various age and time formats based on
+which the records are agregated. Interval options:
+\itemize{
+  \item{\code{"1x1"}} -- by age and year;
+  \item{\code{"1x5"}} -- by age and 5-year time interval;
+  \item{\code{"1x10"}} -- by age and 10-year time interval;
+  \item{\code{"5x1"}} -- by 5-year age group and year;
+  \item{\code{"5x5"}} -- by 5-year age group and 5-year time interval;
+  \item{\code{"5x10"}} --by 5-year age group and 10-year time interval.
+  }}
 
 \item{username}{Your HMD username. If you don't have one you can sign up
 for free on the Human Mortality Database website.}
 
 \item{password}{Your HMD password.}
+
+\item{link}{the main link to the database.}
 }
 \description{
 Function to Download Data for a one Country

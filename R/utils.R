@@ -1,3 +1,9 @@
+# --------------------------------------------------- #
+# Author: Marius D. Pascariu
+# License: MIT
+# Last update: Wed Jun 05 14:35:26 2019
+# --------------------------------------------------- #
+
 
 #' Summary function - display head and tail in a single data.frame
 #' The original code for this function was first written for 'psych' R package
@@ -33,3 +39,10 @@ head_tail <- function(x, hlength = 4, tlength = 4, digits = 4, ellipsis = TRUE){
 }
 
 
+#' Extracting the last n characters from a string
+#' @param x a string
+#' @param n number of characters
+#' @keywords internal
+substrRight <- function(x, n){
+  substr(x, nchar(x) - n + 1, nchar(x))
+}

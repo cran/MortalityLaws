@@ -1,4 +1,9 @@
-rm(list = ls())
+# --------------------------------------------------- #
+# Author: Marius D. Pascariu
+# License: MIT
+# Last update: Thu Jun 06 11:11:53 2019
+# --------------------------------------------------- #
+remove(list = ls())
 library(MortalityLaws)
 
 # Example 1 --- Full life table -----------------
@@ -33,9 +38,15 @@ LT14 = LifeTable(x2, dx = LT11$lt$dx, sex = "total")
 
 
 x3 = c(0, 1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70)
-dx = c(11728, 1998, 2190, 1336, 637, 1927, 420, 453, 475, 905, 1168, 
+dx = c(11728, 1998, 2190, 1336, 637, 1927, 420, 453, 475, 905, 1168,
        2123, 2395, 3764, 5182, 6555, 8652, 10687, 37405)
 LT15 <- LifeTable(x = x3, dx = dx)
+
+
+# Example 3 --- Abridge life table w ax ------------
+ax <- LT15$lt$ax
+ax[1] <- 0.1
+LT16 <- LifeTable(x = x3, dx = dx, ax = ax)
 
 
 # TESTS ----------------------------------------------
@@ -53,7 +64,7 @@ foo.test.lt <- function(X) {
   })
 }
 
-for (j in 1:15) {
+for (j in 1:16) {
   print(j)
   foo.test.lt(X = get(paste0("LT",j)))
 }
@@ -89,7 +100,7 @@ for (k in 7:10) test_lt_consistency(LT6, get(paste0("LT", k)))
 # qx2 <- LT11$lt$qx
 # qx2[length(qx2)] <- NA
 # expect_warning(LifeTable(x = LT11$lt$x, qx = qx2, sex = NULL))
-# 
+#
 # qx3 <- LT1$lt$qx
 # qx3[qx3 %in% tail(qx3, 3)] <- NaN
 # expect_warning(LifeTable(x = LT1$lt$x, qx = qx3))
