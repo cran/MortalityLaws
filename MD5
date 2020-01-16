@@ -1,4 +1,4 @@
-ff6942a8fa82c43b1c35c583385a36de *DESCRIPTION
+206e744a10ce055a7f0905cb5c51913b *DESCRIPTION
 e6f9c8fd6d731c4dce1ac559473c1440 *LICENSE
 e83bc8c50c1c60811ece04512a74a8fa *NAMESPACE
 051964dfbea6253afa621eb3028350cb *NEWS
@@ -27,10 +27,10 @@ abadc3017026c040f8d0d34f32f58b9b *THANKS
 846592df123caba045832b9a4712f3d5 *data/ahmd.rda
 444c1de499d039268d888cb52e248a95 *inst/doc/Installation.R
 fd14b1bab2811bafff790552f0e54a5e *inst/doc/Installation.Rmd
-c729539ce01c637ecd1c68ba0e1c1957 *inst/doc/Installation.pdf
+7166d85c733ca84470922b96cb1bd079 *inst/doc/Installation.pdf
 98cdd4f76869b772bcb925b10e931248 *inst/doc/Intro.R
 3cb1eb71b9b2281bf4995dec069965a0 *inst/doc/Intro.Rmd
-17fafc192607ac0d0a0d7ae79ec1b327 *inst/doc/Intro.pdf
+a147401725841fc0b9bae787950f266a *inst/doc/Intro.pdf
 b3fce16f8489c7218a1052c5e308f491 *man/AIC.MortalityLaw.Rd
 58134b17e0678a79b6690f171d5b0cec *man/AUSregions.Rd
 dc8bc0364aa96de492d92c98db01fe3c *man/CANregions.Rd
@@ -123,7 +123,7 @@ f28b36d8a29b929c7bdd602740f110d2 *man/vandermaen2.Rd
 4cd090ed4304fdb6dea7c24730a86a04 *man/wittstein.Rd
 82bb8b42bf950f00e4752c371088c2cb *tests/testthat.R
 5996cdee1fb961c8e791291c16781cce *tests/testthat/test_LawTable.R
-387cabd1ffde5ea355b7feafb1ec136f *tests/testthat/test_LifeTable.R
+fcb14a8d28ebc3cb667cb11829d8e034 *tests/testthat/test_LifeTable.R
 f73ba16c8c1ad6682c9a094bb4642606 *tests/testthat/test_MortalityLaws.R
 e87a23caeb75733cce61cdf215109885 *tests/testthat/test_MortalityLaws2.R
 e5c5d50d501e04416d74f52b2bf815a9 *tests/testthat/test_ReadAHMD.R

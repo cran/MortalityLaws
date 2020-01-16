@@ -1,7 +1,7 @@
 Package: MortalityLaws
 Type: Package
 Title: Parametric Mortality Models, Life Tables and HMD
-Version: 1.8.2
+Version: 1.8.3
 Authors@R: c(
   person("Marius D.", "Pascariu", role = c("aut", "cre", "cph"), email = "mpascariu@outlook.com", comment = c(ORCID = "0000-0002-2568-6489")),
   person("Vladimir", "Canudas-Romo", role = "ctb"))
@@ -25,9 +25,9 @@ BugReports: https://github.com/mpascariu/MortalityLaws/issues
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2019-11-26 05:25:09 UTC; mpascariu
+Packaged: 2020-01-13 22:24:10 UTC; mpascariu
 Author: Marius D. Pascariu [aut, cre, cph]
     (<https://orcid.org/0000-0002-2568-6489>),
   Vladimir Canudas-Romo [ctb]
 Repository: CRAN
-Date/Publication: 2019-11-26 10:20:09 UTC
+Date/Publication: 2020-01-16 13:20:32 UTC
