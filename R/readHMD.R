@@ -1,13 +1,13 @@
 # --------------------------------------------------- #
 # Author: Marius D. Pascariu
 # License: MIT
-# Last update: Mon Nov 25 19:33:23 2019
+# Last update: Wed Sep 16 09:26:08 2020
 # --------------------------------------------------- #
 
 #' Download The Human Mortality Database (HMD)
 #'
 #' Download detailed mortality and population data for different countries
-#' and regions in a single object from the \href{https://www.mortality.org}{
+#' and regions in a single object from the \href{https://www.mortality.org/}{
 #' Human Mortality Database}.
 #'
 #' @details
@@ -47,9 +47,9 @@
 #' HMD country code/s. Options:
 #' \code{"AUS","AUT","BEL","BGR","BLR","CAN","CHL","CHE","CZE", "DEUTE",
 #' "DEUTNP","DEUTW","DNK","ESP","EST","FIN","FRACNP","FRATNP","KOR","GBR_NIR",
-#' "GBR_NP","GBR_SCO","GBRCENW","GBRTENW","GRC","HUN","HRV","IRL","ISL","ISR",
-#' "ITA","JPN","LTU","LUX","LVA","NLD","NOR","NZL_MA","NZL_NM","NZL_NP","POL",
-#' "PRT","RUS","SVK","SVN","SWE","TWN","USA","UKR"}.
+#' "GBR_NP","GBR_SCO","GBRCENW","GBRTENW","GRC", "HKG", "HUN","HRV","IRL",
+#' "ISL","ISR","ITA","JPN","LTU","LUX","LVA","NLD","NOR","NZL_MA","NZL_NM",
+#' "NZL_NP","POL", "PRT","RUS","SVK","SVN","SWE","TWN","USA","UKR"}.
 #'  If \code{NULL} data for all the countries are downloaded at once;
 #' @param interval Datasets are given in various age and time formats based on
 #' which the records are agregated. Interval options:
@@ -223,10 +223,13 @@ ReadHMD.core <- function(what, country, interval, username, password, link){
   path <- paste0(link, country, interlude, whichFile, ".txt")
 
   if (is.null(username) | is.null(password)) {
-    txt <- RCurl::getURL(url = path)
+    txt <- try(silent = TRUE,
+               RCurl::getURL(url = path))
 
   } else {
-    txt <- RCurl::getURL(url = path, userpwd = paste0(username, ":", password))
+    txt <- try(silent = TRUE,
+      RCurl::getURL(url = path, userpwd = paste0(username, ":", password))
+      )
   }
 
   con  <- try(textConnection(txt),
@@ -256,11 +259,16 @@ ReadHMD.core <- function(what, country, interval, username, password, link){
 #' Country codes
 #' @keywords internal
 HMDcountries <- function() {
-  c("AUS","AUT","BEL","BGR","BLR","CAN","CHL","HRV","CHE","CZE","DEUTNP","DEUTE",
-    "DEUTW","DNK","ESP","EST","FIN","FRATNP","FRACNP","GRC","HUN","IRL","ISL",
-    "ISR","ITA","JPN","KOR","LTU","LUX","LVA","NLD","NOR","NZL_NP","NZL_MA",
-    "NZL_NM","POL","PRT","RUS","SVK","SVN","SWE","TWN","UKR","GBR_NP","GBRTENW",
-    "GBRCENW","GBR_SCO","GBR_NIR","USA")
+  c("AUS","AUT","BEL","BGR","BLR",
+    "CAN","CHL","HRV","CHE","CZE",
+    "DEUTNP","DEUTE", "DEUTW","DNK","ESP",
+    "EST","FIN","FRATNP","FRACNP","GRC",
+    "HUN", "HKG", "IRL","ISL", "ISR",
+    "ITA","JPN","KOR","LTU","LUX",
+    "LVA","NLD","NOR","NZL_NP","NZL_MA",
+    "NZL_NM","POL","PRT","RUS","SVK",
+    "SVN","SWE","TWN","UKR","GBR_NP",
+    "GBRTENW", "GBRCENW","GBR_SCO","GBR_NIR","USA")
 }
 
 #' Data formats
@@ -324,7 +332,7 @@ check_input_ReadHMD <- function(x) {
 #' @export
 print.ReadHMD <- function(x, ...){
   what <- x$input$what
-  cat("Human Mortality Database (www.mortality.org)\n")
+  cat("Human Mortality Database (https://www.mortality.org)\n")
   cat("Downloaded by :", x$input$username, "\n")
   cat("Download Date :", x$download.date, "\n")
   cat("Type of data  :", what, "\n")
