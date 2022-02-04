@@ -1,16 +1,13 @@
 # --------------------------------------------------- #
 # Author: Marius D. PASCARIU
-# License: MIT
-# Last update: Tue Jun 04 17:13:45 2019
+# Last update: Fri Feb 04 10:53:41 2022
 # --------------------------------------------------- #
-
 
 #' Download the Canadian Human Mortality Database (CHMD)
 #'
 #' Download detailed mortality and population data for different
 #' provinces and territories in Canada, in a single object from the
-#' \href{http://www.bdlc.umontreal.ca/chmd/index.htm}{
-#' Canadian Human Mortality Database}.
+#' Canadian Human Mortality Database.
 #'
 #' @details
 #' (Description taken from the CHMD website).
@@ -29,7 +26,7 @@
 #' updating the CHMD web site.
 #'
 #' The CHMD is a "satellite" of the Human Mortality Database (HMD), an
-#' international database which currently holds detailed data flor multiple
+#' international database which currently holds detailed data for multiple
 #' countries or regions. Consequently, the CHMD's underlying methodology
 #' corresponds to the one used for the HMD.
 #'
@@ -92,15 +89,12 @@
 #'                     regions = c('QUE', 'SAS'),
 #'                     interval  = "1x1",
 #'                     save = FALSE)
-#' ls(CHMD_Dx)
-#' CHMD_Dx
 #'
 #' # Download life tables for female population and export data.
 #' LTF <- ReadCHMD(what = "LT_f",
 #'                 regions = c('QUE', 'SAS'),
 #'                 interval  = "1x1",
 #'                 save = TRUE)
-#' LTF
 #' }
 #' @export
 ReadCHMD <- function(what,
@@ -131,12 +125,13 @@ ReadCHMD <- function(what,
       cat(paste("      :Downloading", regions[i], "    "))
     }
 
-    D <- rbind(D, ReadHMD.core(what = what,
-                               country = regions[i],
-                               interval = interval,
-                               username = NULL,
-                               password = NULL,
-                               link = "www.prdh.umontreal.ca/BDLC/data/"))
+    D <- rbind(D, ReadHMD.core(
+      what = what,
+      country = regions[i],
+      interval = interval,
+      username = NULL,
+      password = NULL,
+      link = "http://www.prdh.umontreal.ca/BDLC/data/"))
   }
 
   out <- list(input = input,
@@ -158,8 +153,19 @@ ReadCHMD <- function(what,
 #' Country codes
 #' @keywords internal
 CANregions <- function() {
-  c("CAN", "NFL", "PEI", "NSC", "NBR", "QUE", "ONT",
-    "MAN", "SAS", "ALB", "BCO", "NWT", "YUK")
+  c("CAN",
+    "NFL",
+    "PEI",
+    "NSC",
+    "NBR",
+    "QUE",
+    "ONT",
+    "MAN",
+    "SAS",
+    "ALB",
+    "BCO",
+    "NWT",
+    "YUK")
 }
 
 
@@ -220,9 +226,9 @@ print.ReadCHMD <- function(x, ...){
   cat("Download Date :", x$download.date, "\n")
   cat("Type of data  :", what, "\n")
   cat(paste("Interval      :", x$input$interval, "\n"))
-  cat(paste("Years   :", x$years[1], "--", rev(x$years)[1], "\n"))
-  cat(paste("Ages    :", ageMsg(what, x), "\n"))
-  cat("Regions :", x$input$regions, "\n")
+  cat(paste("Years         :", x$years[1], "--", rev(x$years)[1], "\n"))
+  cat(paste("Ages          :", ageMsg(what, x), "\n"))
+  cat("Regions       :", x$input$regions, "\n")
   cat("\nData:\n")
   print(head_tail(x$data, hlength = 5, tlength = 5))
 }
