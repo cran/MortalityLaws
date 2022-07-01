@@ -1,7 +1,6 @@
 # --------------------------------------------------- #
-# Author: Marius D. Pascariu
-# License: MIT
-# Last update: Wed Jun 05 14:31:51 2019
+# Author: Marius D. PASCARIU
+# Last update: Fri Jul 01 14:32:35 2022
 # --------------------------------------------------- #
 
 #' Check Data Availability in HMD
@@ -11,7 +10,7 @@
 #' @param link Link to the HMD csv file summarising the available data.
 #' Change it only if the path to the file has been modified and the maintainer
 #' of the package is not quick enough to realised that.
-#' Default: "https://www.mortality.org/countries.csv"
+#' Default: "https://former.mortality.org/countries.csv"
 #' @return An object of class \code{availableHMD}.
 #' @seealso \code{\link{ReadHMD}}
 #' @author Marius D. Pascariu
@@ -20,7 +19,7 @@
 #' availableHMD()
 #' }
 #' @export
-availableHMD <- function(link = "https://www.mortality.org/countries.csv") {
+availableHMD <- function(link = "https://former.mortality.org/countries.csv") {
 
   txt  <- RCurl::getURL(link)
   con  <- textConnection(txt)

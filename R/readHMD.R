@@ -1,7 +1,6 @@
 # --------------------------------------------------- #
-# Author: Marius D. Pascariu
-# License: MIT
-# Last update: Wed Sep 16 09:26:08 2020
+# Author: Marius D. PASCARIU
+# Last update: Fri Jul 01 14:30:51 2022
 # --------------------------------------------------- #
 
 #' Download The Human Mortality Database (HMD)
@@ -77,6 +76,11 @@
 #' @author Marius D. Pascariu
 #' @examples
 #' \dontrun{
+#'
+#' # !!! In June 2022, HMD has updated its website and access policy. At the
+#' # moment the function still reads the old website. Use your old username
+#' # and password to access the data.
+#'
 #' # Download demographic data for 3 countries in 1x1 format
 #' age_int  <- 1  # age interval: 1,5
 #' year_int <- 1  # year interval: 1,5,10
@@ -132,7 +136,7 @@ ReadHMD <- function(what, countries = NULL, interval = "1x1",
 
     D <- rbind(D, ReadHMD.core(what, country = countries[i], interval,
                                username, password,
-                               link = "https://www.mortality.org/hmd/"))
+                               link = "https://former.mortality.org/hmd/"))
   }
   out <- list(input = input,
               data = D,
