@@ -1,7 +1,8 @@
-# --------------------------------------------------- #
+# -------------------------------------------------------------- #
+# Title:
 # Author: Marius D. PASCARIU
-# Last update: Fri Jul 01 14:32:35 2022
-# --------------------------------------------------- #
+# Last Update: Tue Feb 21 17:58:41 2023
+# -------------------------------------------------------------- #
 
 #' Check Data Availability in HMD
 #'
@@ -26,19 +27,27 @@ availableHMD <- function(link = "https://former.mortality.org/countries.csv") {
   L    <- read.csv(con, header = TRUE, sep = ",", dec = ".", skip = 0)
   close(con)
 
-  A <- L[L$fu22bar == 1, c("Country",
-                           "Subpop.Code",
-                           "ST_Per_LT_FY",
-                           "ST_Per_LT_EY")]
-  colnames(A) <- c("country", "code", "BOP", "EOP")
-  nc <- length(A$country)
-
-  out <- list(avalable.data = A,
-              number.of.contries = nc,
-              hmd.csv = L,
-              checked.date = date())
-
-  out <- structure(class = "availableHMD", out)
+  if (nrow(L) > 40) { # we need to have a table with more than 40 rows
+    A <- L[L$fu22bar == 1, c("Country",
+                             "Subpop.Code",
+                             "ST_Per_LT_FY",
+                             "ST_Per_LT_EY")]
+    colnames(A) <- c("country", "code", "BOP", "EOP")
+    nc <- length(A$country)
+    
+    out <- list(avalable.data = A,
+                number.of.contries = nc,
+                hmd.csv = L,
+                checked.date = date())
+    
+    out <- structure(class = "availableHMD", out)
+    
+  } else {
+    message("The details could not be found any longer at this url: ", link, 
+            ". Try again later.")
+    out <- NULL
+  }
+  
   return(out)
 }
 
