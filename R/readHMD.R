@@ -1,6 +1,6 @@
 # -------------------------------------------------------------- #
 # Author: Marius D. PASCARIU
-# Last Update: Tue Feb 21 18:25:21 2023
+# Last Update: Thu Jul 20 22:03:44 2023
 # -------------------------------------------------------------- #
 
 #' Download The Human Mortality Database (HMD)
@@ -86,9 +86,6 @@
 #' @examples
 #' \dontrun{
 #'
-#' # !!! In June 2022, HMD has updated its website and access policy. At the
-#' # moment the function still reads the old website. Use your old username
-#' # and password to access the data.
 #'
 #' # Download demographic data for 3 countries in 1x1 format
 #' age_int  <- 1  # age interval: 1,5
@@ -145,7 +142,7 @@ ReadHMD <- function(what, countries = NULL, interval = "1x1",
     
     D <- rbind(D, ReadHMD.core(what, country = countries[i], interval,
                                username, password,
-                               link = "https://former.mortality.org/hmd/"))
+                               link = "https://www.mortality.org/File/GetDocument/hmd.v6/"))
   }
   out <- list(input = input,
               data = D,
@@ -166,6 +163,7 @@ ReadHMD <- function(what, countries = NULL, interval = "1x1",
 #' Save Output in the working directory
 #' @param out Output file
 #' @inheritParams ReadHMD
+#' @return No return value, called for side effects
 #' @keywords internal
 saveOutput <- function(out, show, prefix) {
   fn  <- paste0(prefix, "_", out$input$what) # file name
@@ -176,16 +174,15 @@ saveOutput <- function(out, show, prefix) {
 
 
 #' Print message when saving an object
+#' @inherit saveOutput return
 #' @keywords internal
 saveMsg <- function() {
   wd  <- getwd()
   n   <- nchar(wd)
   wd_ <- paste0("...", substring(wd, first = n - 45, last = n))
-  cat("\n   ")
-  message(paste("The dataset is saved in your working directory:\n  ", wd_),
+  message(paste("\nThe dataset is saved in your working directory:\n  ", wd_),
           appendLF = FALSE)
-  cat("\n   ")
-  message("Download completed!\n")
+  message("\nDownload completed!\n")
 }
 
 
@@ -193,6 +190,7 @@ saveMsg <- function() {
 #' @inheritParams ReadHMD
 #' @param country HMD country code for the selected country. Character;
 #' @param link the main link to the database.
+#' @return A data.frame containing demographic data
 #' @keywords internal
 ReadHMD.core <- function(what, country, interval, username, password, link){
   
@@ -225,8 +223,8 @@ ReadHMD.core <- function(what, country, interval, username, password, link){
     )}
   
   
-  if (link %in% c("https://former.mortality.org/hmd/",
-                  "http://www.ipss.go.jp/p-toukei/JMD/")) {
+  if (link %in% c("https://www.mortality.org/File/GetDocument/hmd.v6/",
+                  "https://www.ipss.go.jp/p-toukei/JMD/")) {
     interlude <- "/STATS/"
     
   } else {
@@ -236,13 +234,24 @@ ReadHMD.core <- function(what, country, interval, username, password, link){
   path <- paste0(link, country, interlude, whichFile, ".txt")
   
   if (is.null(username) | is.null(password)) {
-    txt <- try(silent = TRUE,
-               RCurl::getURL(url = path))
-    
+    response <- try(silent = TRUE, GET(url = path))
+
   } else {
-    txt <- try(silent = TRUE,
+    # "We did not find the right method to login yet. Following the HMD website
+    # change the line below no longer works."
+    response <- try(silent = TRUE,
                RCurl::getURL(url = path, userpwd = paste0(username, ":", password))
     )
+    
+  }
+  
+  # Check if the request was successful (status code 200 means success)
+  if (status_code(response) == 200) {
+    # Read the content of the text file
+    txt <- content(response, "text", encoding = "UTF-8")
+    
+  } else {
+    message("Failed to fetch the content. Status code:", status_code(response))
   }
   
   con  <- try(textConnection(txt),
@@ -270,6 +279,7 @@ ReadHMD.core <- function(what, country, interval, username, password, link){
 
 
 #' Country codes
+#' @return a vector
 #' @keywords internal
 HMDcountries <- function() {
   c("AUS","AUT","BEL","BGR","BLR",
@@ -285,11 +295,13 @@ HMDcountries <- function() {
 }
 
 #' Data formats
+#' @return a vector
 #' @keywords internal
 data_format <- function() c("1x1", "1x5", "1x10", "5x1", "5x5","5x10")
 
 
 #' HMD Indices
+#' @return a vector
 #' @keywords internal
 HMDindices <- function() c("births", "population", "Dx_lexis", "Ex_lexis", "Dx",
                            "mx", "Ex", "LT_f", "LT_m", "LT_t", "e0",
@@ -297,6 +309,7 @@ HMDindices <- function() c("births", "population", "Dx_lexis", "Ex_lexis", "Dx",
 
 #' Check input ReadHMD
 #' @param x a list containing the input arguments from ReadHMD function
+#' @return No return value, called for validating input data
 #' @keywords internal
 check_input_ReadHMD <- function(x) {
   coh_countries <- c("DNK", "FIN", "FRATNP", "FRACNP", "ISL", "ITA", "NLD",
@@ -341,6 +354,7 @@ check_input_ReadHMD <- function(x) {
 #' Print ReadHMD
 #' @param x An object of class \code{"ReadHMD"}
 #' @param ... Further arguments passed to or from other methods.
+#' @return Print data on the console
 #' @keywords internal
 #' @export
 print.ReadHMD <- function(x, ...){
@@ -360,6 +374,7 @@ print.ReadHMD <- function(x, ...){
 
 #' What age(s) are we looking at?
 #' @inheritParams print.ReadHMD
+#' @return A scalar or character indicating age groups
 #' @keywords internal
 ageMsg <- function(what, x) {
   if (any(what %in% c("e0", "e0c"))) {

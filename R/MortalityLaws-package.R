@@ -1,8 +1,7 @@
-# --------------------------------------------------- #
-# Author: Marius D. Pascariu
-# License: MIT
-# Last update: Wed Jun 05 14:34:57 2019
-# --------------------------------------------------- #
+# -------------------------------------------------------------- #
+# Author: Marius D. PASCARIU
+# Last Update: Mon Aug  7 21:48:58 2023
+# -------------------------------------------------------------- #
 
 # MortalityLaws Package
 
@@ -18,7 +17,7 @@
 #' @importFrom stats fitted coef optim predict quantile nlminb pt printCoefmat
 #' df.residual qt vcov
 #' @importFrom pbapply startpb closepb setpb
+#' @import rvest httr
 #' @name MortalityLaws
-#' @aliases NULL
 #' @docType package
 "_PACKAGE"

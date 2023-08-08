@@ -1,12 +1,12 @@
-# --------------------------------------------------- #
-# Author: Marius D. Pascariu
-# License: MIT
-# Last update: Wed Jun 05 14:33:56 2019
-# --------------------------------------------------- #
-
+# -------------------------------------------------------------- #
+# Title:
+# Author: Marius D. PASCARIU
+# Last Update: Fri Jul 21 14:07:00 2023
+# -------------------------------------------------------------- #
 
 #' Function to check input data in MortalityLaw
 #' @inheritParams choose_optim
+#' @return No return value, called for side effects
 #' @keywords internal
 #'
 check.MortalityLaw <- function(input){
@@ -34,10 +34,10 @@ check.MortalityLaw <- function(input){
          }
          if (length(fit.this.x) < 2) {
            stop(paste("More observations needed in order to start the fitting.",
-                      "Increase the length of 'fit.this.x'"), call. = F)
+                      "Increase the length of 'fit.this.x'"), call. = FALSE)
          }
          if (!all(fit.this.x %in% x)) {
-           stop("'fit.this.x' should be a subset of 'x'", call. = F)
+           stop("'fit.this.x' should be a subset of 'x'", call. = FALSE)
          }
 
          # Messages ---
