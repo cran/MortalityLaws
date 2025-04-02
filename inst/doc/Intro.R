@@ -36,10 +36,10 @@ ls(fit)
 ## -----------------------------------------------------------------------------
 summary(fit)
 
-## ---- fig.align='center', out.width='80%', fig.width=9------------------------
+## ----fig.align='center', out.width='80%', fig.width=9-------------------------
 plot(fit)
 
-## ---- fig.align='center', out.width='80%', fig.width=9------------------------
+## ----fig.align='center', out.width='80%', fig.width=9-------------------------
 fit.subset <- MortalityLaw(x   = ages,
                            Dx  = deaths,   
                            Ex  = exposure,
@@ -48,10 +48,10 @@ fit.subset <- MortalityLaw(x   = ages,
                            fit.this.x = 0:65) 
 plot(fit.subset)
 
-## ---- eval=FALSE, warning=FALSE-----------------------------------------------
+## ----eval=FALSE, warning=FALSE------------------------------------------------
 #  availableLaws()
 
-## ---- message=FALSE, warning=FALSE--------------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 availableLF()
 
 ## -----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ ages     <- 45:85
 deaths   <- ahmd$Dx[paste(ages), paste(year)]
 exposure <- ahmd$Ex[paste(ages), paste(year)]
 
-## ---- warning=FALSE, results='hide'-------------------------------------------
+## ----warning=FALSE, results='hide'--------------------------------------------
 # Use 'custom.law' argument to instruct the MortalityLaw function how to behave
 my_model <- MortalityLaw(x = ages,
                          Dx = deaths, 

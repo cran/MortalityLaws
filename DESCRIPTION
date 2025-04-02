@@ -1,7 +1,7 @@
 Package: MortalityLaws
 Type: Package
 Title: Parametric Mortality Models, Life Tables and HMD
-Version: 2.1.0
+Version: 2.1.2
 Authors@R: c(
   person("Marius D.", "Pascariu", role = c("aut", "cre", "cph"), email = "mpascariu@outlook.com", comment = c(ORCID = "0000-0002-2568-6489")),
   person("Vladimir", "Canudas-Romo", role = "ctb"))
@@ -23,12 +23,12 @@ Suggests: testthat, knitr, rmarkdown
 URL: https://github.com/mpascariu/MortalityLaws
 BugReports: https://github.com/mpascariu/MortalityLaws/issues
 Encoding: UTF-8
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-01-15 18:02:23 UTC; mpascariu
+Packaged: 2025-04-02 10:23:20 UTC; dump_
 Author: Marius D. Pascariu [aut, cre, cph]
     (<https://orcid.org/0000-0002-2568-6489>),
   Vladimir Canudas-Romo [ctb]
 Repository: CRAN
-Date/Publication: 2024-01-15 19:50:02 UTC
+Date/Publication: 2025-04-02 10:40:06 UTC
