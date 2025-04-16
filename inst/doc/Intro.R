@@ -7,14 +7,14 @@ opts_chunk$set(collapse = TRUE)
 library(MortalityLaws)
 
 ## ----ReadHMD, eval=FALSE------------------------------------------------------
-#  
-#  # Download HMD data - death counts
-#  HMD_Dx <- ReadHMD(what = "Dx",
-#                    countries = "SWE",            # HMD country code for Sweden
-#                    interval  = "1x1",            # specify data format
-#                    username  = "user@email.com", # here add your HMD username
-#                    password  = "password",       # here add your HMD password
-#                    save = FALSE)                 # save data outside R
+# 
+# # Download HMD data - death counts
+# HMD_Dx <- ReadHMD(what = "Dx",
+#                   countries = "SWE",            # HMD country code for Sweden
+#                   interval  = "1x1",            # specify data format
+#                   username  = "user@email.com", # here add your HMD username
+#                   password  = "password",       # here add your HMD password
+#                   save = FALSE)                 # save data outside R
 
 ## -----------------------------------------------------------------------------
 year     <- 1950
@@ -49,7 +49,7 @@ fit.subset <- MortalityLaw(x   = ages,
 plot(fit.subset)
 
 ## ----eval=FALSE, warning=FALSE------------------------------------------------
-#  availableLaws()
+# availableLaws()
 
 ## ----message=FALSE, warning=FALSE---------------------------------------------
 availableLF()

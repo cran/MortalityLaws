@@ -1,4 +1,4 @@
-bcc56f1977898082ec9fb398fd38eb03 *DESCRIPTION
+a26fc49ee46d09f8db60a197c6c71b21 *DESCRIPTION
 e6f9c8fd6d731c4dce1ac559473c1440 *LICENSE
 7049e228303ace5fd5b6939ffd909511 *NAMESPACE
 0ac2b9d8d8df8c2520212b0f96a73109 *NEWS
@@ -30,12 +30,12 @@ bbadd3e7af2070d485b339d53eb75935 *build/vignette.rds
 a73511c49a76c59c619942fc33f077a8 *data/HMD_sample.rda
 d7dfec506b3ff22c8982d7103ffc3ee6 *data/JMD_sample.rda
 846592df123caba045832b9a4712f3d5 *data/ahmd.rda
-6d546b4a515bd99e1237b5e86012ab0a *inst/doc/Installation.R
+66c5cce8acff6399de3743bd87191152 *inst/doc/Installation.R
 fd14b1bab2811bafff790552f0e54a5e *inst/doc/Installation.Rmd
-d77a6860b3c17c01fbfe5cca8f82feac *inst/doc/Installation.pdf
-24f3fda4ba1b703b2050a0e5d6efbd95 *inst/doc/Intro.R
+d562665219d09a368aed89850c8e4bc7 *inst/doc/Installation.pdf
+ab0c60189eaf939581fefcaf418fdebc *inst/doc/Intro.R
 3cb1eb71b9b2281bf4995dec069965a0 *inst/doc/Intro.Rmd
-92e06dc32a8ddc70e15fc06ef1b1e8fa *inst/doc/Intro.pdf
+e0094a299f20ac411e854b126d36645c *inst/doc/Intro.pdf
 46a2aa783162c4e37b95f98a9345600f *inst/figures/hex_MoralityLaws.png
 41d6fce6eab9bfef033f7e2b60abc317 *man/AHMD_sample.Rd
 0ca59a0c6d46aa8431e8f755d45c20e2 *man/AIC.MortalityLaw.Rd
@@ -136,7 +136,7 @@ b1af304836ea0df4e7e7fa67ac884e1b *man/weibull.Rd
 9727245d2f90a5df0f20a725ff1a936e *tests/testthat/test_LifeTable.R
 af72b5c129b078e42b9ae1cf57c9d034 *tests/testthat/test_MortalityLaws.R
 e87a23caeb75733cce61cdf215109885 *tests/testthat/test_MortalityLaws2.R
-7235496c58549a9826cbb0618fe94c8d *tests/testthat/test_ReadAHMD.R
+8285d95a734d0234943643863615bf45 *tests/testthat/test_ReadAHMD.R
 ccd8264f013a9495c2924ee171a49b6b *tests/testthat/test_ReadCHMD.R
 02b75184f16a41f9a26892148bd6b4c5 *tests/testthat/test_ReadHMD.R
 3cea5a8eb4b822df776307b944b1a0b0 *tests/testthat/test_ReadJMD.R
