@@ -7,14 +7,15 @@ opts_chunk$set(collapse = TRUE)
 library(MortalityLaws)
 
 ## ----ReadHMD, eval=FALSE------------------------------------------------------
-# 
-# # Download HMD data - death counts
-# HMD_Dx <- ReadHMD(what = "Dx",
-#                   countries = "SWE",            # HMD country code for Sweden
-#                   interval  = "1x1",            # specify data format
-#                   username  = "user@email.com", # here add your HMD username
-#                   password  = "password",       # here add your HMD password
-#                   save = FALSE)                 # save data outside R
+# # Download Swedish death counts (ages 0–110, years 1751–2014)
+# HMD_Dx <- ReadHMD(
+#   what      = "Dx",
+#   countries = "SWE",
+#   interval  = "1x1",
+#   username  = "user@email.com",
+#   password  = "password",
+#   save      = FALSE
+# )
 
 ## -----------------------------------------------------------------------------
 year     <- 1950
@@ -22,16 +23,16 @@ ages     <- 0:100
 deaths   <- ahmd$Dx[paste(ages), paste(year)]
 exposure <- ahmd$Ex[paste(ages), paste(year)]
 
-fit <- MortalityLaw(x   = ages,
-                    Dx  = deaths,   # vector with death counts
-                    Ex  = exposure, # vector containing exposures
-                    law = "HP",
-                    opt.method = "LF2")
-
+fit <- MortalityLaw(
+  x          = ages,
+  Dx         = deaths,
+  Ex         = exposure,
+  law        = "HP",
+  opt.method = "LF2"
+)
 
 ## -----------------------------------------------------------------------------
-# inspect the output object
-ls(fit) 
+ls(fit)   # components of the fitted object
 
 ## -----------------------------------------------------------------------------
 summary(fit)
@@ -40,13 +41,25 @@ summary(fit)
 plot(fit)
 
 ## ----fig.align='center', out.width='80%', fig.width=9-------------------------
-fit.subset <- MortalityLaw(x   = ages,
-                           Dx  = deaths,   
-                           Ex  = exposure,
-                           law = "HP",
-                           opt.method = "LF2",
-                           fit.this.x = 0:65) 
+fit.subset <- MortalityLaw(
+  x          = ages,
+  Dx         = deaths,
+  Ex         = exposure,
+  law        = "HP",
+  opt.method = "LF2",
+  fit.this.x = 0:65
+)
 plot(fit.subset)
+
+## ----eval=FALSE---------------------------------------------------------------
+# # Fit with automatic age scaling
+# fit_scaled <- MortalityLaw(
+#   x          = ages,
+#   Dx         = deaths,
+#   Ex         = exposure,
+#   law        = "gompertz",
+#   scale.age  = TRUE
+# )
 
 ## ----eval=FALSE, warning=FALSE------------------------------------------------
 # availableLaws()
@@ -55,27 +68,24 @@ plot(fit.subset)
 availableLF()
 
 ## -----------------------------------------------------------------------------
-
-# Here we define a function for our new model and provide start parameters
 my_gompertz <- function(x, par = c(b = 0.13, M = 45)){
-  hx  <- with(as.list(par), b*exp(b*(x - M)) )
-  # return everything inside this function
-  return(as.list(environment())) 
+  hx <- with(as.list(par), b * exp(b * (x - M)))
+  return(as.list(environment()))   # must return a list
 }
 
 ## -----------------------------------------------------------------------------
-# Select data
 year     <- 1950
 ages     <- 45:85
 deaths   <- ahmd$Dx[paste(ages), paste(year)]
 exposure <- ahmd$Ex[paste(ages), paste(year)]
 
 ## ----warning=FALSE, results='hide'--------------------------------------------
-# Use 'custom.law' argument to instruct the MortalityLaw function how to behave
-my_model <- MortalityLaw(x = ages,
-                         Dx = deaths, 
-                         Ex = exposure, 
-                         custom.law = my_gompertz)
+my_model <- MortalityLaw(
+  x          = ages,
+  Dx         = deaths,
+  Ex         = exposure,
+  custom.law = my_gompertz
+)
 
 ## -----------------------------------------------------------------------------
 summary(my_model)
@@ -84,25 +94,23 @@ summary(my_model)
 plot(my_model)
 
 ## -----------------------------------------------------------------------------
-# Life table for year of 1900
 y  <- 1900
 x  <- as.numeric(rownames(ahmd$mx))
 Dx <- ahmd$Dx[, paste(y)]
 Ex <- ahmd$Ex[, paste(y)]
 
-LT1 <- LifeTable(x, Dx = Dx, Ex = Ex)
-LT2 <- LifeTable(x, mx = LT1$lt$mx)
-LT3 <- LifeTable(x, qx = LT1$lt$qx)
-LT4 <- LifeTable(x, lx = LT1$lt$lx)
-LT5 <- LifeTable(x, dx = LT1$lt$dx)
+LT1 <- LifeTable(x, Dx = Dx, Ex = Ex)   # primary input
+LT2 <- LifeTable(x, mx = LT1$lt$mx)     # from mx
+LT3 <- LifeTable(x, qx = LT1$lt$qx)     # from qx
+LT4 <- LifeTable(x, lx = LT1$lt$lx)     # from lx
+LT5 <- LifeTable(x, dx = LT1$lt$dx)     # from dx
 
 LT1
 
 ## -----------------------------------------------------------------------------
-ls(LT1)
+ls(LT1)   # components of the life table object
 
 ## -----------------------------------------------------------------------------
-# Example
 x  <- c(0, 1, seq(5, 110, by = 5))
 mx <- c(.053, .005, .001, .0012, .0018, .002, .003, .004, 
        .004, .005, .006, .0093, .0129, .019, .031, .049, 
@@ -112,7 +120,4 @@ lt <- LifeTable(x, mx = mx, sex = "female")
 
 ## -----------------------------------------------------------------------------
 lt
-
-## -----------------------------------------------------------------------------
-citation(package = "MortalityLaws")
 

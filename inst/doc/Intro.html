@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Marius D. Pascariu" />
+
+<meta name="date" content="2026-05-05" />
+
+<title>Introduction to MortalityLaws</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to
+<code>MortalityLaws</code></h1>
+<h4 class="author">Marius D. Pascariu</h4>
+<h4 class="date">2026-05-05</h4>
+
+
+
+<div id="package-structure" class="section level1">
+<h1>Package structure</h1>
+<p><strong>MortalityLaws</strong> is an R package that provides tools
+for fitting and analyzing a wide range of parametric mortality models.
+It exploits various optimisation methods to handle complex models
+efficiently. The package can construct full and abridged life tables
+from different inputs and download data directly from the Human
+Mortality Database (HMD).</p>
+<p>The core functions include:</p>
+<ul>
+<li><code>MortalityLaw</code> – fit parametric mortality models.</li>
+<li><code>LifeTable</code> – build life tables.</li>
+<li><code>LawTable</code> – generate life tables from a fitted mortality
+law.</li>
+<li><code>convertFx</code> – convert between mortality functions (e.g.,
+<code>mx</code> to <code>qx</code>).</li>
+<li><code>ReadHMD</code> – download HMD data.</li>
+</ul>
+<p>Support functions such as <code>availableLaws</code>,
+<code>availableLF</code>, and <code>availableHMD</code> return
+information about the implemented mortality laws, loss functions, and
+HMD data availability, respectively. Standard generics
+(<code>predict</code>, <code>plot</code>, <code>summary</code>,
+<code>fitted</code>, <code>residuals</code>) work on
+<code>MortalityLaw</code> and <code>LifeTable</code> objects.</p>
+<p>A small built-in dataset (<code>ahmd</code>) is provided for testing.
+All functions are documented in the usual R way; after loading the
+package with <code>library(MortalityLaws)</code>, you can type
+<code>?MortalityLaw</code> to see its help file.</p>
+</div>
+<div id="downloading-hmd-data" class="section level1">
+<h1>Downloading HMD data</h1>
+<p>The <code>ReadHMD</code> function downloads data from the Human
+Mortality Database <span class="citation">(<a href="#ref-university_of_california_berkeley_human_2016">University of
+California Berkeley, USA and Max Planck Institute for Demographic
+Research, Germany 2016</a>)</span>. To use it, you need a valid HMD
+account.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(MortalityLaws)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Download Swedish death counts (ages 0–110, years 1751–2014)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>HMD_Dx <span class="ot">&lt;-</span> <span class="fu">ReadHMD</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">what      =</span> <span class="st">&quot;Dx&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">countries =</span> <span class="st">&quot;SWE&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">interval  =</span> <span class="st">&quot;1x1&quot;</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">username  =</span> <span class="st">&quot;user@email.com&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">password  =</span> <span class="st">&quot;password&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">save      =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>)</span></code></pre></div>
+<p>You can similarly download:</p>
+<ul>
+<li><code>births</code> – birth records<br />
+</li>
+<li><code>Ex</code> – exposure-to-risk<br />
+</li>
+<li><code>lexis</code> – deaths by Lexis triangles<br />
+</li>
+<li><code>population</code> – population size<br />
+</li>
+<li><code>mx</code> – death rates<br />
+</li>
+<li><code>LT_f</code>, <code>LT_m</code>, <code>LT_t</code> – life
+tables by sex<br />
+</li>
+<li><code>e0</code> – life expectancy at birth<br />
+</li>
+<li><code>mxc</code> – cohort death rates<br />
+</li>
+<li><code>Exc</code> – cohort exposures</li>
+</ul>
+<p>for over 40 countries and regions in various formats
+(<code>1x1</code>, <code>1x5</code>, <code>5x1</code>,
+<code>5x5</code>).</p>
+</div>
+<div id="model-fitting-and-diagnosis" class="section level1">
+<h1>Model fitting and diagnosis</h1>
+<p>Once you have data, fitting a model is straightforward. Below we fit
+a Heligman–Pollard <span class="citation">(<a href="#ref-heligman1980">Heligman and Pollard 1980</a>)</span> model to
+Swedish mortality in 1950 using a Poisson likelihood (loss function
+<code>&quot;LF2&quot;</code>).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>year     <span class="ot">&lt;-</span> <span class="dv">1950</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>ages     <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">100</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>deaths   <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Dx[<span class="fu">paste</span>(ages), <span class="fu">paste</span>(year)]</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>exposure <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Ex[<span class="fu">paste</span>(ages), <span class="fu">paste</span>(year)]</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">MortalityLaw</span>(</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">x          =</span> ages,</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">Dx         =</span> deaths,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">Ex         =</span> exposure,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">law        =</span> <span class="st">&quot;HP&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">opt.method =</span> <span class="st">&quot;LF2&quot;</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>)</span></code></pre></div>
+<div id="examining-the-fitted-model" class="section level2">
+<h2>Examining the fitted model</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">ls</span>(fit)   <span class="co"># components of the fitted object</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="do">## [1] &quot;coefficients&quot;    &quot;deviance&quot;        &quot;df&quot;              &quot;fitted.values&quot;  </span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="do">## [5] &quot;goodness.of.fit&quot; &quot;info&quot;            &quot;input&quot;           &quot;opt.diagnosis&quot;  </span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="do">## [9] &quot;residuals&quot;</span></span></code></pre></div>
+<p>A summary of the fit gives parameter estimates and goodness‑of‑fit
+statistics:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="do">## Heligman-Pollard model: q[x]/p[x] = A^[(x + B)^C] + D exp[-E log(x/F)^2] + G H^x</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="do">## Fitted values: mx</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">## Call: MortalityLaw(x = ages, Dx = deaths, Ex = exposure, law = &quot;HP&quot;, </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="do">##     opt.method = &quot;LF2&quot;)</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="do">## Deviance Residuals:</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">## -0.0312 -0.0002  0.0000  0.0009  0.0003  0.0462 </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="do">## Parameters:</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">##       A       B       C       D       E      F_       G       H </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="do">##  0.0022  0.0146  0.1229  0.0009  2.7565 29.0080  0.0000  1.1141 </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="do">## Residual standard error: 0.6915 on 93 degrees of freedom</span></span></code></pre></div>
+<p>Visual inspection is also easy:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">plot</span>(fit)</span></code></pre></div>
+<p><img role="img" aria-label src="data:image/png;base64,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" alt width="80%" style="display: block; margin: auto;" /></p>
+<p>The default plot shows observed and fitted age‑specific death rates
+(or probabilities), the residuals, and the fitted parameters.</p>
+</div>
+<div id="fitting-on-a-subset-of-ages" class="section level2">
+<h2>Fitting on a subset of ages</h2>
+<p>Sometimes you may want to fit the model only to a certain age range
+while still plotting over the full range. Use <code>fit.this.x</code> to
+specify the ages used during optimisation:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>fit.subset <span class="ot">&lt;-</span> <span class="fu">MortalityLaw</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">x          =</span> ages,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">Dx         =</span> deaths,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">Ex         =</span> exposure,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">law        =</span> <span class="st">&quot;HP&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">opt.method =</span> <span class="st">&quot;LF2&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">fit.this.x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">65</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">plot</span>(fit.subset)</span></code></pre></div>
+<p><img role="img" aria-label src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2AAAAEgCAMAAADli+DTAAABBVBMVEUAAAAAADYAADoAAGEAAGYANogAOjoAOmYAOpAAYawAZpAAZrY2ADY2iM86AAA6ADo6AGY6OgA6Ojo6OpA6ZmY6ZpA6ZrY6kNthAABhADZhrPJh0E9mAABmADpmAGZmOgBmOjpmZgBmZjpmZmZmkJBmkLZmkNtmtttmtv+INgCIz8+Iz/KQOgCQOjqQOmaQZgCQkGaQtpCQttuQ2/+sYQCs8vK2ZgC2Zjq2kDq2kGa2kJC22/+2/7a2//++vr7MzMzPiDbP8vLbkDrbkGbbkJDbtmbbtpDb29vb2//b/7bb/9vb///yrGHyz4jy8qzy8s/y8vL/tmb/25D/27b//7b//9v///9UxPjEAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAWDklEQVR4nO2dCZ/jNhmHRRjYgaHpyQaY7C60BQLNcjTFy9EpYGihDCybkPj7fxR0Or5ky44VW6/+z29nsmM7Gr0ePdFhWWYZAMAbbOoMAEAZCAaARyAYAB6BYAB4BIIB4BEIBoBHIBgAHoFgAHgEggHgEQgGgEcgGAAegWAAeASCAeARCAaARyAYAB6BYAB4BIIB4BEIBoBHIBgAHoFgAHgEggHgESKCnV4t2eKnj9merVzfktw8NO/YM85mzzbZVz/N5Ff1TYcl/y3pYpe/QR7twHHNk1787Pybmt6Y3LiGcBmHZSkz5zypTDw0bq/9UD4/oAoRwRJe2g/Lu5EE06XnuL6TX7U31QVz/J0itVPSYeb1BONRvMozU82Em2CV8wOq0BBMlhVR5Pfsg6Vw7G+8QuNl4PCCPdnxQvDt5WJ5+ygKg9qSpezJT0QROm3VZn28RJWePfv5lrEnLxi7fay86SyY2qE94bvfvXngOXjBvv+HpagaRKo/40d/8EJXFLI4ineX3qgOE7m8+ZP8HVc8aeL36/DUOdCR/EREspKeqeyZsyLPb/6u01acn+vkN0xoCKZqE15i9vzPnbLNYflUlA2+4cRfjmteTOSPG72Fv8iNWb756fkz2xSljanBam8ygukdyhO9W+Xg7lG84e2dSv/2X1uVuBGMvz7KjwP5RnWYTFslcp2TJqNI8ij0OShGIgXT2TNnRZ5fdXJECKjBOiAn2Eq8HJaLp/9Um7Uo4jW9edBbxIsSSm3WxytEH+z2sSBY7U2y98IWO71D/dO79/oDXvx4+uOPmSzAxl7TRJS1n8itrMHUYTKXKpHrnDQZxbc/NeHpc1CORORbZc8IttIZ1yFAsA7ICbaRpfj3vOx8n3/WClQh4N8S7oraIo5PZZlXm/XxKrFaDVZ7k6nB9I6zYGlJsMPyyadJRTAh5s9lfnnKpuqTh+WCpderwWStqaPQ56AciazZZPbys6IzrkOAYB3QEKzQB1upH05fvVCFIDMd8WTx7saMTJwrI7VZH68SqwtWfVMumNphq8H0Fi0Yrxhvv9bFsVSD6cMmqMFETu/OozXyHNRqsPwn1GBDoCEY1+TT7Cs5inj7qD37m+xMZHk/Yc9UH0d3nnR3Sm3Wx58/pat9sPKbCn2w7NyVOvdcjGBs8791rYmYyQQKfTB92Ll/dkXBTttCFOYc6Ej0i85eoQ8mf9AhQLAOiAh2+r25DqZGEb+UI1/ZXg6MqUKgNVPDhfmAoN78ZWmkzHxPmShfXJrKm/JRxL0ZeCuPvWnBTlu2+FBpXhGsNIqoD1P7rj+KeGfOyfkc6EBfyRedvXwU8YU+KB9atV3uAAIigs0Abtbp19SHrHtcZwQSCDYar5j8SCcNBOsLBAPAIxAMAI9AMAA8AsEA8AgEA8AjEAwAj0AwADwCwQDwCAQDwCMQDACPQDAAPALBAPAIBAPAIxQFO23v5IITuBUQTA5BwaRf7zxkWQrDwNQQFOz4bKfckpYBMCUEBTttN9kegoFZQFCwTK5zseGiVe++/fN8GTH8qUNpYcQoQ4GiYGr5QVZfdV39gd94ZGiORxVMvcwwTAhGHAg2bZgQjDgQbNowIRgt9tUV+yDYtGFCMOLMUDDeVzznbMwo5xgmBCPO/ASTz13IyAumw4RgVGEa+cMMS16UgrEoyh7JIBOmn8hTAYJNGyYEo0GiVogXcxLLzEywQrVKXLDGPhgECxQxF1FSmyo1L8FYRIKVcqaBYIECwWYVZj1nGggWKnkTsfowoVkKJv8PwahCMsg0hEGOol8QjCxRBGmYkWCMQbAoyl4UQRrmI1jFrzgFuyzMQCAbZdPdlrMRrKIXBKML2SjnLFjRr3u5BYJRhWyUMxas7hcEIwvZKGcvmPyv9guCkSWOKDXzEKzBLwhGljii1MxCsCa/IBhZ4ohSMwfBGv2CYGSJI0rNDAQrjm9AsAiII0rNbAQT/7svboZgVIkjSs30gln8gmBkiSNKzeSCNbcPMwhGlzii1EwsWP36cg4Eo0ocUWqmFawwgaPqFwQjSxxRamYhWFZrH2aRChZF2YsiSMMcBMsa6i8IRpcogjRMKpi1/yWAYFSJIkjDlILZBzgEEIwqUQRpmFCwlgEOAQSjShRBGqYTrG2AQ0BYsMKN2xCMOFMLllnqL8qC2VcegWDkmFiwzOoXBCNLFEEaJhOsdYBDEKVgo0Q7d+KIUjO5YDa/CAvW0gcbIdb5E0eUmqkEMz0wq1+UBavnTBNH0YsjSs1EgnX7BcHIQjDK47r60AfDlILZBugVEIwqBKM8rj9eNis2iWDmEliLXhCMLgSjPK432WHJqo+3zKYRzMmvOAUjWPbqEAxSCMbZM3YzgwfwQbBazjQQLFC0YA1MJ1iHXxCMLASDnJVgnVfAFBCMKlEEaZhOsA6/IBhZogjScHXB3DpgGQSjS8BBHte6/FbHMgz7qQc5nP0iLpiZLQXBiDONYK1XmDWkBcvn+0Iw4kwjWLdeEIwuYQd52rLbr5/tOo8rLEl4xZLn7lecgo0S7dwJOsrTdnV4/3FfnRfFtWOrbPo+mGsHLCMumK0PNkKs8yfoKI/PH7hg/Ht5c3LHv7h1EwvWowIjLlglZ5qgi54zQUeparC0UoMdZZsxuXmYVrA+fkEwsoQdpWgMsmoLUQmWpbdfTi+Yo18QjCwUo0zURPpk0sm+vSowCEYWilGetqpSSyYXzNWvOAWjWPZqBB2k/d7lZq4oWL8KDIKRJfAgD0vWdGelhesJ1tMvCEYWAkHWBgslh3fqW68smLtfEIwsgQdpr8GmF6yHX4QFKyyLCMFCo60PBsGuEGY3xYV9IRglphSsbwMRgtEl7CBdJ/tqriSY8qvXmYVgVAk6SMtkXytXFOy+X/EhKxj6YFNn4BIsk32tXEewARUYYcEacqaBYLOnebKvnesJ1qsDlkEwuoQdZONkXztXE6xn/QXB6BJFkIarCDbELwhGFgJB9uuD8fLvteQN6IBlZAVjZYkgWJD0EkyOQHgseQNGEAU0BSuN0deihGCB0FOwe9+C3fevwCIVjEDh64RAjDMTbED9FalgXxAofJ0QiLFnH+zeo1/D2ocZVcF0JZVbBsGConPp7Boy2Ht/5W5gBywjK5jkXI9BMOJcQbD7YT0LCEaVGGLM8S/YPYNgVSBYNHgWbLhfdAUT5wN9sFjwK9jgDlhGV7DyOCKG6YnjVbDhHbAsUsFQg82d49p9RSmBZ8GG+0VSMGawRAnBAmDP2ML5hmavgl3kF0XB6n5BsCARt6xs3A71LtjQaeaEBbNHCcEC4LAUNZjrXA6vgokKDIKdgWCSoGMctHS2H8H0HMehkRAUrDYTEYIFh6q5+q7J4cMw1QODYE4502CYfubkcxF7rsnhQTB9iRmCOeVMgxps9rjXXQpfguV+QTCXnGkgGDn8CnZByYNgZAk4xuPzz9cDblcZX7CzXxDMJWcaCEYOP4IV/IJgLjnTQDByeBLs7BcEMzQOEUKwoBh4R/PYgjEIVqd+DaweJYbpyeFDsJJfEExTn8VRjzIKv0gKJmYnrrKGZ8t6EOw8Qu9W8izQFKxauCBYaKSNTcTkjn/dPl5DsIpfEMwAwTRBB3l8ttvfZeldbSv/ntw8+BeMlRuIEMyAGswQdJDH5w/qX3mreuRlevvlFQQr+wXBFM1+QbDQOL3c8X+1pzEnqkpLam3HsQWrVWAQTNE8iAjBgoO7tVcDGkVOWzX9N/EsWN0vCKaAYDlRBGkYVzDWsM790JwRE8xyjat2HSyC0hd0iNPeD1avvyCYU8407IsYpnIEHGLn/WCeRxGbHtQyNBYIRpWgQ5zyfrCmBiIEc8qZBoLNnukEY9Kv0UoeBCNL0CGeXjquiVhaom8EwVjDAOIlJQ+CkSXoEI+NN1we1xs1iao6fD9eDQbBWrAPDkIwEgjB5PSptGrYmIKV5yA6lbwWCAlmuQZWjxLD9IHCBTttxVq/tSkeYwlm9QuCWadJ1aMkWPQaCDtKcWNKbZTeu2DNA4idJa8NeoI5XGgeK+BZE3SUp61oBKYVw3jPbLWXTcTqs1cg2Ei0/n4IViToKK0zOVK22J22tWcbjSNYi18QLINgZYKOsrkGs6OCfXOZYW1+QTAB+mAFwo6ysQ9mZwzBWv2CYC4504Rd9FwhG2VthCMbS7DGC2CXlbw4BYthlB6C9aW1AoNgLjnTYF3EoPEkWLtfEMwlZxoINnNkB8y68KgfwTr8gmAuOdNAsLmTNkw3bGUEwdo6YMNLHgQjS+AxNs7ptXKpYLYpvheXPAhGFgIx1ta2sXKhYN1+QbDWsUEIFhwJ/3tunI++TDD7FF+nktcKGcFa5tJDsNBI+8gluFSwTr8gWB/BcB1s3rSPIjahgm2817+b7vZha8lrJ07BRgl35kQRpEEG2zXS3oxoHzq8b2jOiAhmvxWsIUoIRo7hgrn0v9pKXhc0BOvwC4JRZ5hgqtg4+QXBUINViCJIw6A+mPbLoQNmL3mdQDCqRBGkYdAoYo/6K3bB0AerE0WQhp6CKafcq6+WktcFEcE6xt4hGHH6CWZWb1HVFwS7PEwIRpxhgvXwC4K55EwDwcihBXMyLNfLuXl4QcmDYGSJIkhDD8GGVF/DSx4EI0sUQRrcBTO1V0+/Ihesa3YhBCOOq2Alu3pdlR6aMxKCdczjgGB0MQ0++cObrivNJbtYvtH+hv/+gh/3rb++efN63W96f/4MzjgF66rxKEA/wgJ6JkfLXCkp1LllWPTLbtjrH3yHf//sG59AsF6CfRHD84voR1igU7DCuEZZqLa24n9/8ZZ8/cu3/vp6/fFS3j2TMrbYqTtqbh+z08vfsMW7YiXv5M5sE0voL35DSrC+fTAIRg0jmLWNaPOrVbD/fO8T8/p6zY1Jbx5EzcS/5NLe6e3jacuNEtvkg1/MthX/kZZgjjnTQDBymD6YrQor+NW0y1La/v3N38nX1z/4kWwicot000++nLZKKvFcwL1yT2yTr4SaiC79KQhGHDOKaLk3ucWvtkGOomDPZLtwJZqB+jm2nJV6XBlvHvJ/Zpt8ZEW+eGPwghVHkbpyZt4CwajRLVjf616CYhNRC5aJ5XgWO/PcFyXY/uZz8XBbvY2mYOiDVaEfYYFcsOY24jC/3rz57DvyRQ5ybPRD2KVnpgWoBDuuP37nIW8VEmsiQjAL9CMsYARrvhLGhq3WUR6m58Ykt49CnMPbOzW4IZ4FKJVL2Z2QzWy7IzXIMUAwXAejRi5Y01yOlsHFTj4zF5qf/XYpx+D1eo2iL7bY6RosOyzFi94mXukM0ztVYKjBqNMh2LD6q73kORK4YE56QTDynAWrGza4gdha8lyhIFjfKCEYOc6C1VuDo/gVp2CO9RcEI895kKM+UA/Bhobp7BcEo05FsIJP4zQQYxasf5QQjBwFwcpVGLtkCLFc8v6Rqa9+hC/YgBqsDyOdm+sTbs4HUOiD1QQbXoHJu8E4P3r9w0/ELA41k6OAvpx8FNM8xOSN41oeX7yzJWDBeihQr8FcCbeYhpvzARRGEd+UjLpQsLfy/zsKJmdOiYthBggGwQhQFaxg2AU9sFyw1z/85Zax7/Kvxru+KoKVPAxfsB45M2+EYKGSqL957eHNJcHKhjUv03Fvo3hQQbC8idh011dNsEIbMVzB+vSQIBgNEjVhXcz2K2MXrKdfJcN0H+ytomBNd33prtcNqSZiryEICEYCVVNkhZtBDEXBCm1E7pqlIA2uwZru+qoMchT9ClawfmN8EIwEjoLlhl06RN8oWMNdX5UmYomwBeuZs9J7MUwfHnkTUZfynLJg2rCLRhAFTYI13fVFULCehb9nDUaibJIIooppoFW3VwUzCwSML1jTXV/EBBtQuUAw4tQEk4b1e7xDnaJg8qbKVA/TV+76oiXYkNYbBCNORbDSEr6jlbxBBCfYoN4RBKNFvuKFoSrY+Rl75ATrNYJwCcOjhGDkqAlWMIyWYFfzC4J1QCIIV+qC5YaN49c8BBPwkK7yan6f22spnxCMDqWP27pgI9k1F8GyK9VgF0bp4RfMEBJBVDiu2c3nazHltoL6A8cgmH/Dpo4yFCgKlqyyvVy5umpYg2CFJxSREmy0UUSWP8apcKYuy1lUEBRMXG86vL1rmCrVJNi4DM3zfAUbM0wIRgIpmHALgs0sTAhGg15NxFmUPAhGFoqCHdfs9uvGQQ49wDwr/myGsceCzTfMcj7dGfHsXJuQ8z4Ml4iveIyvP8AVszfwGNa0s2NjeISc92FAsD7HQLALCTnvrdRGOAwQrM8xEOxCQs57KxBslGMg2IWEnPdWINgox0CwCwk5761AsFGOgWAXEnLeAZg9EAwAj0AwADwCwQDwCAQDwCMQDACPQDAAPBKZYGI90NqCvwXEcxnEYm+HJVPP92rA7GtJa68mgW/s6aiHF5kkurLVlxHCHCVKe5gtyZ626kaIsU/KNMQlmFrJ2v5Xk/tSXvT2tVtdzuh9XWnJJfJt6fDCszkn0ZlUT8YIc4wo7WG2JZvc6dXHxz0pExGXYHIlgb2lZsr0UqXijuiktrj1Gb3PKS1LOil78mJzTqIrqb6MEeYIUbaE2ZKs3JWOf1ImIi7B9oWnCVnhf9nTy3etLUSzryMt+YxLWzp/f5BtJ5OEU7Z6MEKYY0TZEqZDsmOflImISzD1uK63d23H5E2Tw/uNRc/s60hL1RLWdGTJM0m4ZKsPI4Q5TpTWMFuT5Q1LvnvskzIREKzC+cGzDQ9ByeH72tMqPOK8MZ2pBXMK8+IohwmWSXEhWIB0NzsOy7zIlJ5SXkE8frk1rULJaExn4iaiW5gXR2kNsyuHnb85GOISTP692jrO+snk+ShA0yF6X3taaoc9HVnyTBKd2erJCGGOE6U1zJZkdatzM/ZJmYi4BOsa+jWfyOcP3qY01L72tJK79nTknqmG6R3CHCdKa5gtybr95mCIS7Cui5epuXQqrsTaPjzNvta0klXp2IaMTHih2SXMUaIcfKG58zcHQ2SCAXBdIBgAHoFgAHgEggHgEQgGgEcgGAAegWAAeASCAeARCAaARyAYAB6BYAB4BIIB4BEIBoBHIBgAHoFgAHgEggHgEQgGgEcgGAAegWCDSFZZ2rK6NhG8RskoLAjQDQQbxPH5589DX1Csmzii9AsEG0Yaxcev7yjT924eElmTJezmw93haZa92mVyy+G9pVzfl7HbX28ysSdMINgwwl9y1gWfUYoHKPEGqHgyS7rh38UijE+FYGrL4f3H08udWJA7/eAp/9lbPjwDwYaRfES/C+Y/ynSllpBbCYFeacHUFi2bXO3tVwG3VCHYIA7v/+sl/SrMe5RcMKmQqMdUfcXrMbVFCSZqsP1d+lG47XEINgSxnmb4qzp34T/KVPa+xBKoCVu8tzttRU9MbdH9sVS0JC2LmAcBBAMz4ZXVIsuDpIIAgoGZYBUsXYRbgUEwAHwCwQDwCAQDwCMQDACPQDAAPALBAPAIBAPAIxAMAI9AMAA8AsEA8AgEA8AjEAwAj0AwADzyf/Nepo6UE9EeAAAAAElFTkSuQmCC" alt width="80%" style="display: block; margin: auto;" /></p>
+<p>The grey area indicates the ages that were actually used in the
+fit.</p>
+</div>
+<div id="age-scaling-for-numerical-stability" class="section level2">
+<h2>Age scaling for numerical stability</h2>
+<p>When fitting models with exponential or power terms (e.g., Gompertz,
+Makeham), large age values can cause numerical overflow or slow
+convergence. <strong>Centering and/or scaling the age variable</strong>
+helps stabilise the optimisation.</p>
+<p>The <code>MortalityLaw</code> function provides the argument
+<code>scale.age</code>. When set to <code>TRUE</code>, ages are centered
+by subtracting the mean age in the fitting range and scaled by dividing
+by the standard deviation. This transformation often improves
+convergence speed and parameter identifiability without affecting the
+shape of the mortality curve.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Fit with automatic age scaling</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>fit_scaled <span class="ot">&lt;-</span> <span class="fu">MortalityLaw</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">x          =</span> ages,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">Dx         =</span> deaths,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">Ex         =</span> exposure,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">law        =</span> <span class="st">&quot;gompertz&quot;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">scale.age  =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>)</span></code></pre></div>
+<p><strong>Explanation:</strong><br />
+- Centering removes a large constant offset, reducing correlations
+between the intercept and slope parameters.<br />
+- Scaling brings all ages to a comparable magnitude, which is especially
+beneficial for algorithms like <code>nlm</code> or <code>optim</code>
+that assume unit‑scale variables.<br />
+- Internally, the model is fitted on the transformed ages, and the
+resulting parameters are back‑transformed so that the reported values
+correspond to the original age scale.</p>
+<p>You can also manually scale ages before passing them to
+<code>MortalityLaw</code> (e.g., <code>(x - mean(x))/sd(x)</code>), but
+using the built‑in <code>scale.age</code> argument is simpler and
+ensures correct back‑transformation.</p>
+</div>
+</div>
+<div id="mortality-laws-in-the-package" class="section level1">
+<h1>Mortality laws in the package</h1>
+<p>The following table lists all parametric mortality laws currently
+implemented. The <strong>Code</strong> column shows the string used in
+the <code>law</code> argument of <code>MortalityLaw</code>.</p>
+<table>
+<colgroup>
+<col width="46%" />
+<col width="34%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mortality Law</th>
+<th>Predictor</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gompertz</td>
+<td><span class="math inline">\(\mu(x) = A e^{Bx}\)</span></td>
+<td><code>gompertz</code></td>
+</tr>
+<tr class="even">
+<td>Gompertz (reparam.)</td>
+<td><span class="math inline">\(\mu(x) = \frac{1}{\sigma}
+\exp\left\{\frac{x-M}{\sigma}\right\}\)</span></td>
+<td><code>gompertz0</code></td>
+</tr>
+<tr class="odd">
+<td>Inverse‑Gompertz</td>
+<td><span class="math inline">\(\mu(x) =
+\frac{\frac{1}{\sigma}\exp\left\{\frac{x-M}{\sigma}\right\}}{\exp\left\{e^{-(x-M)/\sigma}\right\}-1}\)</span></td>
+<td><code>invgompertz</code></td>
+</tr>
+<tr class="even">
+<td>Makeham</td>
+<td><span class="math inline">\(\mu(x) = A e^{Bx} + C\)</span></td>
+<td><code>makeham</code></td>
+</tr>
+<tr class="odd">
+<td>Makeham (reparam.)</td>
+<td><span class="math inline">\(\mu(x) = \frac{1}{\sigma}
+\exp\left\{\frac{x-M}{\sigma}\right\} + C\)</span></td>
+<td><code>makeham0</code></td>
+</tr>
+<tr class="even">
+<td>Opperman</td>
+<td><span class="math inline">\(\mu(x) = \frac{A}{\sqrt{x}} + B + C
+\sqrt[3]{x}\)</span></td>
+<td><code>opperman</code></td>
+</tr>
+<tr class="odd">
+<td>Thiele</td>
+<td><span class="math inline">\(\mu(x) = A_1 e^{-B_1 x} + A_2
+e^{-\frac12 B_2 (x-C)^2} + A_3 e^{B_3 x}\)</span></td>
+<td><code>thiele</code></td>
+</tr>
+<tr class="even">
+<td>Wittstein</td>
+<td><span class="math inline">\(q(x) = \frac{1}{B} A^{-(B x)^N} + A^{-(M
+- x)^N}\)</span></td>
+<td><code>wittstein</code></td>
+</tr>
+<tr class="odd">
+<td>Perks</td>
+<td><span class="math inline">\(\mu(x) = \frac{A + B C^x}{B C^{-x} + 1 +
+D C^x}\)</span></td>
+<td><code>perks</code></td>
+</tr>
+<tr class="even">
+<td>Weibull</td>
+<td><span class="math inline">\(\mu(x) = \frac{1}{\sigma} \left(
+\frac{x}{M} \right)^{\frac{M}{\sigma}-1}\)</span></td>
+<td><code>weibull</code></td>
+</tr>
+<tr class="odd">
+<td>Inverse‑Weibull</td>
+<td><span class="math inline">\(\mu(x) = \frac{\frac{1}{\sigma} \left(
+\frac{x}{M} \right)^{-\frac{M}{\sigma}-1}}{\exp\left\{\left( \frac{x}{M}
+\right)^{-\frac{M}{\sigma}}\right\}-1}\)</span></td>
+<td><code>invweibull</code></td>
+</tr>
+<tr class="even">
+<td>Van der Maen</td>
+<td><span class="math inline">\(\mu(x) = A + Bx + Cx^2 +
+\frac{I}{N-x}\)</span></td>
+<td><code>vandermaen</code></td>
+</tr>
+<tr class="odd">
+<td>Van der Maen (simpl.)</td>
+<td><span class="math inline">\(\mu(x) = A + Bx +
+\frac{I}{N-x}\)</span></td>
+<td><code>vandermaen2</code></td>
+</tr>
+<tr class="even">
+<td>Quadratic</td>
+<td><span class="math inline">\(\mu(x) = A + Bx + Cx^2\)</span></td>
+<td><code>quadratic</code></td>
+</tr>
+<tr class="odd">
+<td>Beard</td>
+<td><span class="math inline">\(\mu(x) = \frac{A e^{Bx}}{1 + K A
+e^{Bx}}\)</span></td>
+<td><code>beard</code></td>
+</tr>
+<tr class="even">
+<td>Makeham‑Beard</td>
+<td><span class="math inline">\(\mu(x) = \frac{A e^{Bx}}{1 + K A e^{Bx}}
++ C\)</span></td>
+<td><code>makehambeard</code></td>
+</tr>
+<tr class="odd">
+<td>Gamma‑Gompertz</td>
+<td><span class="math inline">\(\mu(x) = \frac{A e^{Bx}}{1 +
+\frac{AG}{B}(e^{Bx}-1)}\)</span></td>
+<td><code>ggompertz</code></td>
+</tr>
+<tr class="even">
+<td>Siler</td>
+<td><span class="math inline">\(\mu(x) = A_1 e^{-B_1 x} + A_2 + A_3
+e^{B_3 x}\)</span></td>
+<td><code>siler</code></td>
+</tr>
+<tr class="odd">
+<td>Heligman–Pollard</td>
+<td><span class="math inline">\(\frac{q(x)}{p(x)} = A^{(x+B)^C} + D
+e^{-E (\ln x - \ln F)^2} + G H^x\)</span></td>
+<td><code>HP</code></td>
+</tr>
+<tr class="even">
+<td>Heligman–Pollard (HP2)</td>
+<td><span class="math inline">\(q(x) = A^{(x+B)^C} + D e^{-E (\ln x -
+\ln F)^2} + \frac{G H^x}{1+G H^x}\)</span></td>
+<td><code>HP2</code></td>
+</tr>
+<tr class="odd">
+<td>Heligman–Pollard (HP3)</td>
+<td><span class="math inline">\(q(x) = A^{(x+B)^C} + D e^{-E (\ln x -
+\ln F)^2} + \frac{G H^x}{1+K G H^x}\)</span></td>
+<td><code>HP3</code></td>
+</tr>
+<tr class="even">
+<td>Rogers–Planck</td>
+<td><span class="math inline">\(q(x) = A_0 + A_1 e^{-Ax} + A_2 e^{B(x-U)
+- e^{-C(x-U)}} + A_3 e^{D x}\)</span></td>
+<td><code>rogersplanck</code></td>
+</tr>
+<tr class="odd">
+<td>Martinelle</td>
+<td><span class="math inline">\(\mu(x) = \frac{A e^{Bx} + C}{1 + D
+e^{Bx}} + K e^{Bx}\)</span></td>
+<td><code>martinelle</code></td>
+</tr>
+<tr class="even">
+<td>Carriere 1</td>
+<td><span class="math inline">\(S(x) = \psi_1 S_1(x) + \psi_2 S_2(x) +
+\psi_3 S_3(x)\)</span></td>
+<td><code>carriere1</code></td>
+</tr>
+<tr class="odd">
+<td>Carriere 2</td>
+<td><span class="math inline">\(S(x) = \psi_1 S_1(x) + \psi_4 S_4(x) +
+\psi_3 S_3(x)\)</span></td>
+<td><code>carriere2</code></td>
+</tr>
+<tr class="even">
+<td>Kostaki</td>
+<td><span class="math inline">\(\frac{q(x)}{p(x)} = A^{(x+B)^C} + D
+e^{-E_i (\ln x - \ln F)^2} + G H^x\)</span></td>
+<td><code>kostaki</code></td>
+</tr>
+<tr class="odd">
+<td>Kannisto</td>
+<td><span class="math inline">\(\mu(x) = \frac{A e^{Bx}}{1 + A e^{Bx}} +
+C\)</span></td>
+<td><code>kannisto</code></td>
+</tr>
+</tbody>
+</table>
+<p>Use <code>availableLaws()</code> in R to see this list
+dynamically:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">availableLaws</span>()</span></code></pre></div>
+</div>
+<div id="loss-functions-in-the-package" class="section level1">
+<h1>Loss functions in the package</h1>
+<p>A parametric mortality model is fitted by optimising a loss function
+(e.g., a negative log‑likelihood or a sum of squared errors).
+MortalityLaws provides eight loss functions that can emphasise different
+portions of the mortality curve. Use <code>availableLF()</code> to view
+their descriptions:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">availableLF</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="do">## Loss functions available in the package:</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="do">##  LOSS FUNCTION                                  CODE     </span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="do">##  L = -[Dx * log(mu) - mu*Ex]                    poissonL </span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="do">##  L = -[Dx * log(1 - exp(-mu)) - (Ex - Dx)*mu]   binomialL</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="do">##  L =  [1 - mu/ov]^2                             LF1      </span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="do">##  L =  log[mu/ov]^2                              LF2      </span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="do">##  L =  [(ov - mu)^2]/ov                          LF3      </span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="do">##  L =  [ov - mu]^2                               LF4      </span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="do">##  L =  [ov - mu] * log[ov/mu]                    LF5      </span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="do">##  L =  abs(ov - mu)                              LF6      </span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="do">## LEGEND:</span></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="do">## Dx: Death counts</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="do">## Ex: Population exposed to risk</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="do">## mu: Estimated value</span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="do">## ov: Observed value</span></span></code></pre></div>
+</div>
+<div id="custom-mortality-laws" class="section level1">
+<h1>Custom mortality laws</h1>
+<p>You are not limited to the built‑in laws – you can define your own
+hazard function and pass it via <code>custom.law</code>. As an example,
+we fit a reparametrised Gompertz model in terms of the modal age at
+death <span class="math inline">\(M\)</span> <span class="citation">(<a href="#ref-missov2015">Missov et al. 2015</a>)</span>:</p>
+<p><span class="math display">\[
+\mu_x = \beta e^{\beta (x - M)}.
+\]</span></p>
+<p>First, define the hazard function. The function must return a list
+containing at least the hazard vector <code>hx</code>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>my_gompertz <span class="ot">&lt;-</span> <span class="cf">function</span>(x, <span class="at">par =</span> <span class="fu">c</span>(<span class="at">b =</span> <span class="fl">0.13</span>, <span class="at">M =</span> <span class="dv">45</span>)){</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  hx <span class="ot">&lt;-</span> <span class="fu">with</span>(<span class="fu">as.list</span>(par), b <span class="sc">*</span> <span class="fu">exp</span>(b <span class="sc">*</span> (x <span class="sc">-</span> M)))</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">as.list</span>(<span class="fu">environment</span>()))   <span class="co"># must return a list</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>}</span></code></pre></div>
+<p>Select data and fit:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>year     <span class="ot">&lt;-</span> <span class="dv">1950</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>ages     <span class="ot">&lt;-</span> <span class="dv">45</span><span class="sc">:</span><span class="dv">85</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>deaths   <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Dx[<span class="fu">paste</span>(ages), <span class="fu">paste</span>(year)]</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>exposure <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Ex[<span class="fu">paste</span>(ages), <span class="fu">paste</span>(year)]</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>my_model <span class="ot">&lt;-</span> <span class="fu">MortalityLaw</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="at">x          =</span> ages,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">Dx         =</span> deaths,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">Ex         =</span> exposure,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="at">custom.law =</span> my_gompertz</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">summary</span>(my_model)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="do">## Custom Mortality Law</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="do">## Fitted values: mx</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="do">## Call: MortalityLaw(x = ages, Dx = deaths, Ex = exposure, custom.law = my_gompertz)</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="do">## Deviance Residuals:</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="do">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="do">## -0.0029 -0.0011  0.0002  0.0009  0.0015  0.0122 </span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="do">## Parameters:</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="do">##       b       M </span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="do">##  0.0993 35.8014 </span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="do">## Residual standard error: 0.4486 on 39 degrees of freedom</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">plot</span>(my_model)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="full-life-tables" class="section level1">
+<h1>Full life tables</h1>
+<p>The <code>LifeTable</code> function can build complete or abridged
+life tables from several types of input:</p>
+<ul>
+<li>Death counts and exposures (<code>Dx</code>, <code>Ex</code>)</li>
+<li>Age‑specific death rates (<code>mx</code>)</li>
+<li>Death probabilities (<code>qx</code>)</li>
+<li>Survivorship (<code>lx</code>)</li>
+<li>Death distribution (<code>dx</code>)</li>
+</ul>
+<p>Only one of these inputs needs to be specified – the rest are ignored
+if present.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>y  <span class="ot">&lt;-</span> <span class="dv">1900</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>x  <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">rownames</span>(ahmd<span class="sc">$</span>mx))</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>Dx <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Dx[, <span class="fu">paste</span>(y)]</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>Ex <span class="ot">&lt;-</span> ahmd<span class="sc">$</span>Ex[, <span class="fu">paste</span>(y)]</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>LT1 <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">Dx =</span> Dx, <span class="at">Ex =</span> Ex)   <span class="co"># primary input</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>LT2 <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">mx =</span> LT1<span class="sc">$</span>lt<span class="sc">$</span>mx)     <span class="co"># from mx</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>LT3 <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">qx =</span> LT1<span class="sc">$</span>lt<span class="sc">$</span>qx)     <span class="co"># from qx</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>LT4 <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">lx =</span> LT1<span class="sc">$</span>lt<span class="sc">$</span>lx)     <span class="co"># from lx</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>LT5 <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">dx =</span> LT1<span class="sc">$</span>lt<span class="sc">$</span>dx)     <span class="co"># from dx</span></span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a>LT1</span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="do">## Full Life Table</span></span>
+<span id="cb16-15"><a href="#cb16-15" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-16"><a href="#cb16-16" tabindex="-1"></a><span class="do">## Number of life tables: 1 </span></span>
+<span id="cb16-17"><a href="#cb16-17" tabindex="-1"></a><span class="do">## Dimension: 111 x 10 </span></span>
+<span id="cb16-18"><a href="#cb16-18" tabindex="-1"></a><span class="do">## Age intervals: [0,1) [1,2) [2,3) ...   ... [108,109) [109,110) [110,+) </span></span>
+<span id="cb16-19"><a href="#cb16-19" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb16-20"><a href="#cb16-20" tabindex="-1"></a><span class="do">##      x.int   x     mx     qx   ax    lx    dx    Lx      Tx    ex</span></span>
+<span id="cb16-21"><a href="#cb16-21" tabindex="-1"></a><span class="do">##      [0,1)   0 0.1513 0.1404 0.49 1e+05 14042 92802 4808384 48.08</span></span>
+<span id="cb16-22"><a href="#cb16-22" tabindex="-1"></a><span class="do">##      [1,2)   1 0.0479 0.0468  0.5 85958  4023 83931 4715582 54.86</span></span>
+<span id="cb16-23"><a href="#cb16-23" tabindex="-1"></a><span class="do">##      [2,3)   2 0.0191 0.0189  0.5 81935  1552 81157 4631651 56.53</span></span>
+<span id="cb16-24"><a href="#cb16-24" tabindex="-1"></a><span class="do">##      [3,4)   3  0.013 0.0129  0.5 80383  1041 79861 4550494 56.61</span></span>
+<span id="cb16-25"><a href="#cb16-25" tabindex="-1"></a><span class="do">##      [4,5)   4 0.0094 0.0093  0.5 79342   740 78971 4470633 56.35</span></span>
+<span id="cb16-26"><a href="#cb16-26" tabindex="-1"></a><span class="do">##      [5,6)   5 0.0067 0.0067  0.5 78602   523 78340 4391661 55.87</span></span>
+<span id="cb16-27"><a href="#cb16-27" tabindex="-1"></a><span class="do">##       &lt;NA&gt; ...    ...    ...  ...   ...   ...   ...     ...   ...</span></span>
+<span id="cb16-28"><a href="#cb16-28" tabindex="-1"></a><span class="do">##  [108,109) 108   6.75 0.9988 0.15     0     0     0       0  0.15</span></span>
+<span id="cb16-29"><a href="#cb16-29" tabindex="-1"></a><span class="do">##  [109,110) 109   6.75 0.9988 0.15     0     0     0       0  0.15</span></span>
+<span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="do">##    [110,+) 110   6.75      1 0.15     0     0     0       0  0.15</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">ls</span>(LT1)   <span class="co"># components of the life table object</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="do">## [1] &quot;call&quot;         &quot;lt&quot;           &quot;process_date&quot;</span></span></code></pre></div>
+</div>
+<div id="abridged-life-tables" class="section level1">
+<h1>Abridged life tables</h1>
+<p>Abridged life tables use wider age intervals (e.g., 0, 1–4, 5–9, …).
+The same <code>LifeTable</code> function works for any abridged age
+structure.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>x  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">110</span>, <span class="at">by =</span> <span class="dv">5</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">c</span>(.<span class="dv">053</span>, .<span class="dv">005</span>, .<span class="dv">001</span>, .<span class="dv">0012</span>, .<span class="dv">0018</span>, .<span class="dv">002</span>, .<span class="dv">003</span>, .<span class="dv">004</span>, </span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>       .<span class="dv">004</span>, .<span class="dv">005</span>, .<span class="dv">006</span>, .<span class="dv">0093</span>, .<span class="dv">0129</span>, .<span class="dv">019</span>, .<span class="dv">031</span>, .<span class="dv">049</span>, </span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>       .<span class="dv">084</span>, .<span class="dv">129</span>, .<span class="dv">180</span>, .<span class="dv">2354</span>, .<span class="dv">3085</span>, .<span class="dv">390</span>, .<span class="dv">478</span>, .<span class="dv">551</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>lt <span class="ot">&lt;-</span> <span class="fu">LifeTable</span>(x, <span class="at">mx =</span> mx, <span class="at">sex =</span> <span class="st">&quot;female&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>lt</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="do">## Abridged Life Table</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="do">## Number of life tables: 1 </span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a><span class="do">## Dimension: 24 x 10 </span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="do">## Age intervals: [0,1) [1,5) [5,10) ...   ... [100,105) [105,110) [110,+) </span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a><span class="do">##      x.int   x     mx     qx   ax    lx   dx     Lx      Tx    ex</span></span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a><span class="do">##      [0,1)   0  0.053 0.0516  0.2 1e+05 5162  95878 6485467 64.85</span></span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a><span class="do">##      [1,5)   1  0.005 0.0198 1.44 94838 1878 374547 6389590 67.37</span></span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a><span class="do">##     [5,10)   5  0.001  0.005  2.5 92960  464 463640 6015042 64.71</span></span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a><span class="do">##    [10,15)  10 0.0012  0.006  2.5 92496  553 461098 5551402 60.02</span></span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a><span class="do">##    [15,20)  15 0.0018  0.009  2.5 91943  824 457653 5090304 55.36</span></span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a><span class="do">##    [20,25)  20  0.002   0.01  2.5 91119  907 453326 4632651 50.84</span></span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a><span class="do">##       &lt;NA&gt; ...    ...    ...  ...   ...  ...    ...     ...   ...</span></span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a><span class="do">##  [100,105) 100   0.39 0.8577 1.73   407  349    896    1014  2.49</span></span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a><span class="do">##  [105,110) 105  0.478 0.9084 1.59    58   53    110     119  2.05</span></span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a><span class="do">##    [110,+) 110  0.551      1 1.59     5    5      8       8  1.59</span></span></code></pre></div>
+</div>
+<div id="citation" class="section level1">
+<h1>Citation</h1>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="at">package =</span> <span class="st">&quot;MortalityLaws&quot;</span>)</span></code></pre></div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-heligman1980" class="csl-entry">
+Heligman, Larry, and John H Pollard. 1980. <span>“The Age Pattern of
+Mortality.”</span> <em>Journal of the Institute of Actuaries</em> 107
+(01): 49–80.
+</div>
+<div id="ref-missov2015" class="csl-entry">
+Missov, Trifon I, Adam Lenart, Laszlo Nemeth, Vladimir Canudas-Romo, and
+James W Vaupel. 2015. <span>“The Gompertz Force of Mortality in Terms of
+the Modal Age at Death.”</span> <em>Demographic Research</em> 32:
+1031–48.
+</div>
+<div id="ref-university_of_california_berkeley_human_2016" class="csl-entry">
+University of California Berkeley, USA, and Max Planck Institute for
+Demographic Research, Germany. 2016. <em>Human <span>Mortality</span>
+<span>Database</span></em>. <a href="https://www.mortality.org/">https://www.mortality.org/</a>.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
