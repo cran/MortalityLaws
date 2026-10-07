@@ -7,20 +7,19 @@
 weibull(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Note that if sigma > m, then the mode of the density is 0 and hx is a
-non-increasing function of x, while if sigma < m, then the mode is
-greater than 0 and hx is an increasing function.
-m > 0 is a measure of location
-sigma > 0 is measure of dispersion
+The Weibull hazard; increasing when \eqn{\sigma < M}, non-increasing
+otherwise. NOT DEFINED AT BIRTH: the hazard is 0 when the shape is greater
+than one and unbounded when it is smaller, so age 0 is reported as missing
+and carries no weight in the fit; fit the law from age 1.
 }
 \examples{
 weibull(x = 1:20)

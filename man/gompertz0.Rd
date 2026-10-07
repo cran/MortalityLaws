@@ -7,16 +7,18 @@
 gompertz0(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Gompertz Mortality Law - informative parameterization
+The Gompertz hazard in terms of its mode \eqn{M} and dispersion
+\eqn{\sigma}, \eqn{\mu_x = (1/\sigma) \exp((x - M)/\sigma)}; the same curve
+as \code{gompertz} with coefficients that read off the plot.
 }
 \examples{
 gompertz0(x = 45:90)

@@ -7,16 +7,17 @@
 martinelle(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Martinelle Model - 1987
+A generalisation of the Perks formula for old age, with an extra linear term
+that lets the hazard keep some exponential rise above the logistic plateau.
 }
 \examples{
 martinelle(x = 0:100)

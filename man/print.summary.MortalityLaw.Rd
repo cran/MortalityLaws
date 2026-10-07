@@ -2,19 +2,26 @@
 % Please edit documentation in R/MortalityLaw_S3.R
 \name{print.summary.MortalityLaw}
 \alias{print.summary.MortalityLaw}
-\title{Print summary.MortalityLaw}
+\title{Print a MortalityLaw Summary}
 \usage{
 \method{print}{summary.MortalityLaw}(x, ...)
 }
 \arguments{
-\item{x}{an object of class \code{"summary.MortalityLaw"}}
+\item{x}{An object of class \code{"summary.MortalityLaw"}.}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{Additional arguments affecting the summary produced.}
 }
 \value{
-Print data on console
+The object \code{x}, invisibly. Called for its printed output.
 }
 \description{
-Print summary.MortalityLaw
+Prints the contents of a \code{"summary.MortalityLaw"} object: the model
+description, the fit window, the matched call, the coefficients, the fit
+measures (method and optimiser outcome, deviance, R-squared and RMSE, and
+for likelihood-based fits the goodness-of-fit block) and the residuals on
+the raw and the deviance scale.
+}
+\seealso{
+\code{\link{summary.MortalityLaw}}.
 }
 \keyword{internal}

@@ -7,16 +7,17 @@
 HP(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Heligman-Pollard Mortality Law - 8 parameters - 1980
+The Heligman-Pollard eight-parameter law of the whole lifespan, fitted on
+the odds of dying \eqn{q_x/p_x}; the fitted quantity is a death probability.
 }
 \examples{
 HP(x = 0:100)

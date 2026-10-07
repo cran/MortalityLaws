@@ -7,16 +7,17 @@
 gompertz(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Gompertz Mortality Law - 1825
+The exponential rise of mortality with age, the classic adult and old-age
+law. The hazard is unbounded, so fit it over the adult ages.
 }
 \examples{
 gompertz(x = 45:90)

@@ -7,16 +7,22 @@
 opperman(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Opperman Mortality Law - 1870
+A three-term hazard across the whole lifespan, \eqn{\mu_x = A/\sqrt{x + 1} -
+B + C\sqrt{x + 1}}, evaluated at ages shifted by one year so the term stays
+finite at age 0. THIS SIGN IS A CHOICE: the published form writes the middle
+term with a free sign (\eqn{+b}); the engine estimates on the log scale and
+so requires positivity, hence the \code{- B} (\eqn{b = -B < 0}) branch,
+which is the branch mortality data occupy. See the opperman entry of
+\code{\link{availableLaws}}.
 }
 \examples{
 opperman(x = 1:25)

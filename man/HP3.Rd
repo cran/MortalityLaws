@@ -7,16 +7,17 @@
 HP3(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Heligman-Pollard 3 Mortality Law - 9 parameters
+The Heligman-Pollard law with an extra parameter in the old-age term, making
+it a full logistic that bends at the oldest ages.
 }
 \examples{
 HP3(x = 0:100)

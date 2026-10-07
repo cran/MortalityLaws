@@ -7,16 +7,18 @@
 kannisto(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Kannisto Mortality Law - 1998
+The Kannisto logistic hazard, which rises like Gompertz and levels off at a
+ceiling of one; the field standard for closing a life table at old age (see
+the \code{close} and \code{omega} arguments of \code{\link{LifeTable}}).
 }
 \examples{
 kannisto(x = 85:120)

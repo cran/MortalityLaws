@@ -1,3 +1,154 @@
+version 3.0.0 - "candle clock"
+- The catalogue of laws grew to 38, every model on its published formula, and the
+package wears a logo of its own.
+- Life tables grew: build one from life expectancy, close or extend the open age,
+and name the average time lived in the first year - now by the Human Mortality
+Database rule, so life expectancy at birth differs slightly from the last release.
+- Downloads work again, the models and life tables are now tested almost
+completely, and the package speaks up less, as a note rather than a warning.
+- The plots are new throughout, in one house style.
+- The documentation is new end to end and now lives on a website: a guided
+introduction, every model with its published formula, and the life tables.
+
+version 2.13.1 - "elbow room"
+- Website figures are taller and sharper, the survivorship panel shows l(x), and
+article tables give short columns only the width they need.
+
+version 2.13.0 - "chalk outline"
+- The package now speaks up less and more clearly: where it adjusts the data
+you gave it, it says so once, as a note rather than a warning, and a value you
+supply for the last, open age interval is used as given instead of quietly
+replaced.
+- Axis tick labels are short and readable (20k, 100k rather than 2e+04 and
+1e+05), a panel carries only as many as it has room for, and the figure
+subtitle is drawn larger than before.
+- Fitted models, life tables and conversions all draw their own figures in one
+house style, with the margins around every panel reworked so the labels clear
+the data, and any layout you ask for comes out whole.
+- The average time lived in the first year now follows the Andreev-Kingkade
+rule, and a life table can be built from a life expectancy vector.
+- New models for the first years of life, two for old age and a straight-line
+law join the catalogue, with every model on its published formula.
+- Downloads from the mortality databases work again, and the models and the
+life tables are almost fully tested.
+
+version 2.12.1 - "quiet attic"
+- Old working files the package no longer needs have been cleared out, and
+the readme has been tidied up.
+
+version 2.12.0 - "full picture"
+- The documentation is new end to end: a guided introduction, a tour of the
+mortality models and their formulas, and a walk through the life table methods.
+- The package has a website now, with every function indexed and every article
+readable online. The installation guide has moved into the README.
+
+version 2.11.0 - "new clothes"
+- The plots are new throughout: a fitted law draws its fit and a residual
+diagnosis, a life table its survivorship, hazard, deaths and expectancy, and
+a conversion its two curves. The panels split as you like.
+- The fit summary grew to match: the fit window, the method, the deviance,
+the R-squared and RMSE. A conversion result now plots and prints itself.
+- The life table stays quiet when its own ax method assigns the open
+interval; only your own values are announced when replaced.
+
+version 2.10.4 - "small print"
+- A failed login now says the session was not set up, and the test suite is
+half the size and about four times faster.
+
+version 2.10.3 - "hex appeal"
+- The package wears a new logo: two curves of a life, with the little figures
+between them thinning out as the years pass.
+
+version 2.10.2 - "safety net"
+- The models and the life tables are now tested almost completely, so a change
+that breaks them is caught before it reaches you.
+
+version 2.10.1 - "open shelf"
+- The mortality models can be called by name again, as before, without
+crowding the help index.
+
+version 2.10.0 - "late bend"
+- Three models are new: two forms of the Gompertz-Makeham family for old age,
+and the 1725 straight-line law, which warns that it applies only to the ages
+it was fitted to.
+- The Weibull model no longer invents a value at birth; the first age is now
+reported as missing, which fixes its fit for the first years of life.
+- The catalogue now flags which existing models describe the same curve.
+
+version 2.9.1 - "quiet shelf"
+- The death models no longer crowd the help pages; the model catalogue now
+lists them in one place, with where each fits and its source paper.
+
+version 2.9.0 - "backwards glance"
+- Life tables can now be built from a vector of life expectancy. The
+function works out the survival curve and the death rates that reproduce the
+supplied figures.
+- The conversion function accepts life expectancy as a starting point as
+well, so it can now convert between any pair of the five table inputs and
+the seven table columns.
+
+version 2.8.0 - "second rule"
+- Life tables now use the Human Mortality Database rule for the average
+time lived in the first year of life, named after its authors, Andreev
+and Kingkade. It is more accurate and is now the default.
+- Life expectancy for babies therefore changes slightly. The previous
+rule is still available.
+
+version 2.7.0 - "long tail"
+- Life tables can now be closed more accurately at the open age, either by
+using a mortality model to correct the last interval in place or by extending
+the table to an older age before closing.
+- How long people live on average in the interval where they die is now
+chosen by name, and by default it follows the standard unadjusted formula.
+Previously an adjustment was applied automatically at the youngest ages
+whenever a sex was given, so life expectancy for babies differs slightly
+from before.
+
+version 2.6.1 - "second opinion"
+- Fit summaries now judge the quality of a fit more reliably, and models
+fitted from death counts and exposures are compared on the correct scale.
+
+version 2.6.0 - "early hours"
+- Four new models for the first years of life are available: the negative
+Gompertz, the Pareto II, the shifted power, and the truncated power model.
+- The truncated power model needs age detail finer than single years; with
+coarse data it falls back to the shifted power model and says so.
+
+version 2.5.1 - "sign post"
+- The help page for the 1870 mortality model now explains why its middle
+term is written with a minus sign.
+
+version 2.5.0 - "twin anchor"
+- Life tables can now use either of the two published versions of the
+childhood mortality adjustment: the one used until now, and the original
+1983 rule. The default is unchanged, so results stay the same as before.
+
+version 2.4.0 - "swept deck"
+- The internet address shown for the Canadian mortality database now works;
+it used to point to a page that could not be opened.
+- Four numbers in the country list were missing their commas, and a few names
+were misspelled in the help pages.
+- Installing the package now needs one fewer outside library.
+
+version 2.3.1 - "open channel"
+- Data downloads from the Human Mortality Database work again; the login had
+stopped working, so downloads with credentials always reported a failure.
+
+version 2.3.0 - "steady harbor"
+- Comparing models and building life tables is more reliable now, most
+noticeably for babies and at the oldest ages.
+- The affected models now follow their original published formulas, and
+one of them has a name of its own.
+- One old model was added. Error messages, plots and help pages improved.
+
+version 2.2.2
+- Documentation update for testing functions;
+
+version 2.2.0
+- Simplified optimisation process by using PORT routines for all models. 
+This should improve the fitting process and the convergence in some cases;
+- Documentation update for main functions;
+
 version 2.1.2
 - update web source for Australian Human Mortality Database;
 
@@ -5,7 +156,9 @@ version 2.1.1
 - provide anchors to all documented external \links{};
 
 version 2.1.0
-- replace several stop errors with messages so the failure to connect to databases (for whatever reason) results in a gracefull ending of the process and to avoid triggering CRAN random error;
+- replace several stop errors with messages so the failure to connect to databases (for
+whatever reason) results in a graceful ending of the process and to avoid triggering
+CRAN random error;
 
 version 2.0.3
 - Change interaction with external resources and update documentation;
@@ -24,29 +177,30 @@ informative message if the resource is not available or has changed.
 version 1.8.1
 - LifeTable(): fix minor bug that prevented the closing of the life table with
 a qx = 1 in some situations;
-- Updata internal unit tests.
+- Update internal unit tests.
 
 version 1.8.0
-- readCHMD(): New function useful to download the Canadian Human Mortality Database;
-- readAHMD(): New function useful to download the Australian Human Mortality Database;
-- readJMD(): New function useful to download the Japanese Mortality Database;
+- ReadCHMD(): New function useful to download the Canadian Human Mortality Database;
+- ReadAHMD(): New function useful to download the Australian Human Mortality Database;
+- ReadJMD(): New function useful to download the Japanese Mortality Database;
 - convertFx(): improve the speed of the function > 5x;
 - availableHMD(): improve the speed of the function  > 100x;
-- LifeTable(): the argument 'ax' now accepts as input a numerical vector as well allowing the
-user to decide the timing of occurrence of death in each age interval;
-- Update LICENCE: MIT. Drop GLP-3.
+- LifeTable(): the argument 'ax' now accepts as input a numerical vector as well
+allowing the user to decide the timing of occurrence of death in each age interval;
+- Update LICENSE: MIT. Drop GPL-3.
 
 version 1.7.0
 - New models: Kannisto-Makeham (1998) and Strehler-Mildvan (1960);
-- ReadHMD() new functionalities. The function can now download cohort life tables, cohort life expectancy and exposure-to-risk by Lexis triangles data.
+- ReadHMD() new functionalities. The function can now download cohort life tables,
+cohort life expectancy and exposure-to-risk by Lexis triangles data.
 
 version 1.6.0
 - convertFx(): New function! Easy conversion between the life table indicators;
-- MortalityLaws(): Remove scale.x argument. Now, the function will identify
+- MortalityLaw(): Remove scale.x argument. Now, the function will identify
 by default which laws require a scaled x in fitting;
-- MortalityLaws(): When a mortality law is fitted on a subset of the input data,
-using fit.this.x argument, the residuals and fitted values are computed and plotted for
-the entire age range (in input). Previously only the fitted values followed this
+- MortalityLaw(): When a mortality law is fitted on a subset of the input data,
+using fit.this.x argument, the residuals and fitted values are computed and plotted
+for the entire age range (in input). Previously only the fitted values followed this
 approach;
 - MortalityLaw(): set the argument `show = FALSE` as default;
 - Drop `diagram` suggestion from DESCRIPTION and vignettes.
@@ -56,10 +210,11 @@ version 1.5.0
 - Fix bug in the ReadHMD() function due to HMD migration from http to https.
 
 version 1.4.0
-- Compute e[x] at the beginning of the age interval in LifeTable(). This affects only the ex column in the life table, all the other indicator remain unchanged;
+- Compute e[x] at the beginning of the age interval in LifeTable(). This affects only
+the ex column in the life table, all the other indicator remain unchanged;
 - New mortality model: Gamma-Gompertz (Vaupel.1979 version);
-- Fix bug related to fit.this.x argument in MortalityLaws();
-- More rigorous referencing in avalaibleLaws() function.
+- Fix bug related to fit.this.x argument in MortalityLaw();
+- More rigorous referencing in availableLaws() function.
 
 version 1.3.0
 - Add generic functions: deviance, df.residual;
@@ -67,8 +222,9 @@ version 1.3.0
 
 version 1.2.0
 - Vignettes;
-- Fix predict.MortalityLaws bug for cases where the input is of class matrix;
-- Solution for 'Kostaki' inflexion point due to high correlation between estimated parameters;
+- Fix predict.MortalityLaw bug for cases where the input is of class matrix;
+- Solution for 'Kostaki' inflexion point due to high correlation between estimated
+parameters;
 - Add 'scale.x' argument in MortalityLaw function;
 - Add 'ax' argument in LifeTable function;
 - Add 'show' argument in ReadHMD function;
@@ -77,5 +233,5 @@ version 1.2.0
 version 1.0.5
 - Fix issues with minpack.lm not being imported.
 
-version 1.0.0:
+version 1.0.0
 - First stable version (on CRAN).

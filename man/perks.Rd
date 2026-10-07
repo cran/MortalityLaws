@@ -7,16 +7,17 @@
 perks(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Perks Model - 1932
+The Perks logistic hazard, \eqn{\mu_x = (A + B C^x) / (1 + D C^x)}, which
+flattens the Gompertz rise at the oldest ages.
 }
 \examples{
 perks(x = 50:100)

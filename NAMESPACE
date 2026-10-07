@@ -3,8 +3,11 @@
 S3method(AIC,MortalityLaw)
 S3method(deviance,MortalityLaw)
 S3method(df.residual,MortalityLaw)
+S3method(dispersion,MortalityLaw)
 S3method(logLik,MortalityLaw)
+S3method(plot,LifeTable)
 S3method(plot,MortalityLaw)
+S3method(plot,convertFx)
 S3method(predict,MortalityLaw)
 S3method(print,LifeTable)
 S3method(print,MortalityLaw)
@@ -14,6 +17,7 @@ S3method(print,ReadHMD)
 S3method(print,ReadJMD)
 S3method(print,availableLF)
 S3method(print,availableLaws)
+S3method(print,convertFx)
 S3method(print,summary.MortalityLaw)
 S3method(summary,MortalityLaw)
 export(HP)
@@ -35,9 +39,12 @@ export(beard_makeham)
 export(carriere1)
 export(carriere2)
 export(convertFx)
+export(demoivre)
+export(dispersion)
 export(ggompertz)
 export(gompertz)
 export(gompertz0)
+export(gompertz_logquad)
 export(invgompertz)
 export(invweibull)
 export(kannisto)
@@ -45,49 +52,70 @@ export(kannisto_makeham)
 export(kostaki)
 export(makeham)
 export(makeham0)
+export(makeham_logquad)
 export(martinelle)
+export(neggompertz)
 export(opperman)
+export(pareto_2)
 export(perks)
 export(quadratic)
 export(rogersplanck)
+export(scholey)
+export(scholey_shifted_power)
 export(siler)
+export(steffensen)
 export(strehler_mildvan)
 export(thiele)
 export(vandermaen)
 export(vandermaen2)
 export(weibull)
 export(wittstein)
-import(httr)
-import(rvest)
-importFrom(RCurl,getURL)
-importFrom(graphics,abline)
-importFrom(graphics,axis)
-importFrom(graphics,barplot)
-importFrom(graphics,box)
-importFrom(graphics,hist)
-importFrom(graphics,layout)
-importFrom(graphics,legend)
-importFrom(graphics,lines)
-importFrom(graphics,par)
-importFrom(graphics,plot)
-importFrom(graphics,rect)
-importFrom(methods,is)
-importFrom(pbapply,closepb)
-importFrom(pbapply,setpb)
-importFrom(pbapply,startpb)
-importFrom(stats,coef)
-importFrom(stats,df.residual)
-importFrom(stats,fitted)
-importFrom(stats,nlminb)
-importFrom(stats,optim)
-importFrom(stats,predict)
-importFrom(stats,printCoefmat)
-importFrom(stats,pt)
-importFrom(stats,qt)
-importFrom(stats,quantile)
-importFrom(stats,vcov)
-importFrom(tidyr,spread)
-importFrom(utils,head)
-importFrom(utils,read.csv)
-importFrom(utils,read.table)
-importFrom(utils,tail)
+importFrom(graphics,
+  abline,
+  axis,
+  box,
+  hist,
+  layout,
+  legend,
+  lines,
+  mtext,
+  par,
+  plot,
+  points,
+  rect,
+  title
+)
+importFrom(httr,
+  GET,
+  POST,
+  content,
+  cookies,
+  set_cookies,
+  status_code,
+  timeout
+)
+importFrom(pbapply,
+  closepb,
+  setpb,
+  startpb
+)
+importFrom(stats,
+  coef,
+  df.residual,
+  dnorm,
+  fitted,
+  lowess,
+  nlminb,
+  optim,
+  predict,
+  qnorm,
+  qqnorm,
+  quantile,
+  residuals,
+  sd
+)
+importFrom(utils,
+  head,
+  read.table,
+  tail
+)

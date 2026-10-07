@@ -7,16 +7,17 @@
 vandermaen(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Van der Maen Model - 1943
+A quadratic hazard with a reciprocal closing term, \eqn{\mu_x = A + Bx +
+Cx^2 + I/(N - x)}, so the table can close at a finite age \eqn{N}.
 }
 \examples{
 vandermaen(x = 0:100)

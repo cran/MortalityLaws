@@ -4,7 +4,7 @@
 \alias{LawTable}
 \title{Compute Life Tables from Parameters of a Mortality Law}
 \usage{
-LawTable(x, par, law, sex = NULL, lx0 = 1e+05, ax = NULL)
+LawTable(x, par, law, sex = NULL, lx0 = 1e+05, ax = "andreev_kingkade")
 }
 \arguments{
 \item{x}{Numeric vector of ages at the beginning of each age interval. 
@@ -18,8 +18,8 @@ For an abridged life table, use the lower bound of each interval
         single life table).
   \item A numeric \strong{matrix} or \strong{data.frame} where each row 
         corresponds to a separate set of parameters (producing multiple 
-        life tables). Column names should match the parameter names of 
-        the chosen law.
+        life tables). Column names must match the parameter names of 
+        the chosen law, as described in the details below.
 }}
 
 \item{law}{The name of the mortality law to be used (e.g., \code{"gompertz"},
@@ -36,13 +36,64 @@ and females.}
 age 0. Default is \code{100,000}. All subsequent life-table columns 
 (\code{lx}, \code{dx}, \code{Lx}, \code{Tx}) are scaled accordingly.}
 
-\item{ax}{Numeric vector representing the average number of person-years 
-lived in the age interval by those who die in that interval. If 
-\code{NULL} (the default), \code{ax} is estimated internally using 
-a standard formula. You may supply a single value (applied to all 
-intervals) or a vector of the same length as \code{x}. A common 
-assumption is \code{ax = 0.5}, which places deaths at the midpoint 
-of each interval.}
+\item{ax}{The average number of person-years lived in each age interval
+  by those who die in it, given either as values or as the method that
+  produces them. Accepts two forms: 
+  \itemize{ 
+  \item a numeric scalar or vector: a scalar is applied to all intervals, 
+        a vector must have the same length as \code{x}. A common 
+        assumption is \code{ax = 0.5}, which places deaths at the 
+        midpoint of each interval; 
+  \item a method name, one of \code{"andreev_kingkade"} (the default), 
+        \code{"cfm"}, \code{"preston"} or \code{"coale_demeny"} (see 
+        below). 
+  } 
+
+  \code{"andreev_kingkade"} follows the rule the Human Mortality Database
+  applies to its period life tables (Methods Protocol, version 6, section
+  7.1): the Andreev-Kingkade (2015) formula sets the value for the first
+  year of life from \code{m0}, every other closed interval uses half its
+  length (\code{n/2}), and the open interval uses
+  \code{1/mx}. It is the most accurate of the four methods and the one
+  that reproduces the published HMD life tables most closely. Because it
+  produces a numeric \code{ax} before the rates are converted, the
+  \code{mx} to \code{qx} step uses the exact identity
+  \code{qx = n*mx/(1 + (n - ax)*mx)}, which is the identity the protocol
+  uses (equation 74). The Andreev-Kingkade value is a property of a
+  one-year first interval that starts at birth, so when the first interval
+  is wider or the table starts above age 0 the interval keeps the ordinary
+  midpoint value instead.
+
+  The other three methods share the same basis, the standard lifetable 
+  identity \code{ax = n + 1/m - n/q} under a constant force of mortality 
+  (Preston, Heuveline and Guillot 2001, eq. 3.15), and differ in how 
+  they treat the first two intervals: 
+  \itemize{ 
+  \item \code{"cfm"}: the identity alone, for every interval; 
+  \item \code{"preston"}: the identity, with the first two intervals 
+        replaced by the Coale-Demeny West separation factors published 
+        by Preston et al. (2001), table 3.3, when \code{sex} is given; 
+  \item \code{"coale_demeny"}: the identity, with the first two intervals 
+        replaced by the original 1983 Coale-Demeny rule expressed in 
+        \code{qx}, reproduced by the PAS software, when \code{sex} is 
+        given. 
+  } 
+  \code{"preston"} and \code{"coale_demeny"} agree exactly once 
+  \code{mx[1]} reaches 0.107, and differ by at most a few thousandths of 
+  a year below it. Both coincide with \code{"cfm"} when \code{sex} is 
+  \code{NULL}. \code{"cfm"} and the Coale-Demeny variants adjust
+  \code{ax} after the rates have been converted, so they leave the
+  constant force of mortality conversion in place; only
+  \code{"andreev_kingkade"} changes the conversion itself.
+
+  A value supplied for the open age interval is kept as given. Everybody
+  alive there dies in that interval, so its own rate implies what the
+  average time lived in it should be (\code{1/mx}); a value that differs
+  is reported and left alone, which leaves the \code{ax} and \code{mx}
+  columns of the table disagreeing at that age, or the model-implied
+  value when \code{close} is set. The one exception is a table entered
+  from \code{ex}, where the curve being inverted fixes that interval.
+  See \code{Details}.}
 }
 \value{
 An object of class \code{"LifeTable"} containing the following 
@@ -71,6 +122,14 @@ externally (e.g., via \code{\link{MortalityLaw}} or by hand). The
 mortality law, and \code{law} must be one of the valid codes listed by 
 \code{\link{availableLaws}}.
 
+The \code{ax} argument is passed straight to \code{\link{LifeTable}}; its
+default, \code{"andreev_kingkade"}, is the rule the Human Mortality
+Database applies to its period life tables (Methods Protocol, version 6;
+see \code{\link{LifeTable}} for the alternatives). Because a law is
+evaluated on a possibly scaled age vector, the first interval is only
+treated as a one-year interval with the Andreev-Kingkade rule when the
+ages passed in \code{x} really start one year apart.
+
 \strong{Important caveat: age scaling during fitting}
 
 Several mortality laws (e.g., Gompertz, Makeham) internally \emph{scale} 
@@ -95,6 +154,16 @@ starts from the same lower age bound used during fitting.
 For models that do \emph{not} scale (e.g., Heligman-Pollard \code{"HP"}), 
 this limitation does not apply, and \code{LawTable} can be used for any 
 age range.
+
+\strong{Matching the coefficients to the model parameters}
+
+The coefficients supplied in \code{par} are matched to the parameters of 
+the chosen law \strong{by name and in any order}. For a matrix or a 
+data.frame the column names must therefore be the parameter names of that 
+law (e.g. \code{c("A", "B", "C")} for \code{"makeham"}); the row names are 
+used as the labels of the resulting life tables and must be supplied. An 
+unnamed vector keeps the positional convention, i.e. the coefficients are 
+read in the order in which the parameters are documented for the law.
 }
 \examples{
 # Example 1 --- Makeham --- multiple life tables from a matrix of parameters
@@ -119,15 +188,14 @@ LawTable(x = x1, par = C1, law = L1)
 # table produced by LawTable is valid only from age 45 onward.
 
 # ---- Example 1B: correct usage ----
-LawTable(x = 45:100, par = c(0.00717, 0.07789, 0.00363), law = L1)
+LawTable(x = x1, par = c(0.00717, 0.07789, 0.00363), law = L1)
 
 # ---- Example 1C: incorrect usage ----
 # The code below uses the same coefficients but starts at age 25.
 # Because the model was fitted on scaled ages (starting at 45),
 # the life table at age 25 will be meaningless (e.g., e25 equals e45).
-\dontrun{
 LawTable(x = 25:100, par = c(0.00717, 0.07789, 0.00363), law = L1)
-}
+
 
 # ---- How to check which laws apply scaling ----
 A <- availableLaws()$table

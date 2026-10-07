@@ -7,16 +7,17 @@
 wittstein(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Wittstein Mortality Law - 1883
+A two-term law giving a death probability rather than a hazard, \eqn{q_x =
+(1/B) A^{-(Bx)^N} + A^{-(M - x)^N}}, so it covers both ends of the lifespan.
 }
 \examples{
 wittstein(x = 0:100)

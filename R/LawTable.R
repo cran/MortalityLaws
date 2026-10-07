@@ -19,6 +19,14 @@
 #' mortality law, and \code{law} must be one of the valid codes listed by 
 #' \code{\link{availableLaws}}.
 #'
+#' The \code{ax} argument is passed straight to \code{\link{LifeTable}}; its
+#' default, \code{"andreev_kingkade"}, is the rule the Human Mortality
+#' Database applies to its period life tables (Methods Protocol, version 6;
+#' see \code{\link{LifeTable}} for the alternatives). Because a law is
+#' evaluated on a possibly scaled age vector, the first interval is only
+#' treated as a one-year interval with the Andreev-Kingkade rule when the
+#' ages passed in \code{x} really start one year apart.
+#'
 #' \strong{Important caveat: age scaling during fitting}
 #'
 #' Several mortality laws (e.g., Gompertz, Makeham) internally \emph{scale} 
@@ -44,6 +52,16 @@
 #' this limitation does not apply, and \code{LawTable} can be used for any 
 #' age range.
 #'
+#' \strong{Matching the coefficients to the model parameters}
+#'
+#' The coefficients supplied in \code{par} are matched to the parameters of 
+#' the chosen law \strong{by name and in any order}. For a matrix or a 
+#' data.frame the column names must therefore be the parameter names of that 
+#' law (e.g. \code{c("A", "B", "C")} for \code{"makeham"}); the row names are 
+#' used as the labels of the resulting life tables and must be supplied. An 
+#' unnamed vector keeps the positional convention, i.e. the coefficients are 
+#' read in the order in which the parameters are documented for the law.
+#'
 #' @inheritParams MortalityLaw
 #' @inheritParams LifeTable
 #'
@@ -53,8 +71,8 @@
 #'           single life table).
 #'     \item A numeric \strong{matrix} or \strong{data.frame} where each row 
 #'           corresponds to a separate set of parameters (producing multiple 
-#'           life tables). Column names should match the parameter names of 
-#'           the chosen law.
+#'           life tables). Column names must match the parameter names of 
+#'           the chosen law, as described in the details below.
 #'   }
 #'
 #' @inherit LifeTable return details
@@ -68,85 +86,40 @@
 #'
 #' @author Marius D. Pascariu
 #'
-#' @examples
-#' # Example 1 --- Makeham --- multiple life tables from a matrix of parameters
-#'
-#' x1 <- 45:100
-#' L1 <- "makeham"
-#' C1 <- matrix(
-#'   c(0.00717, 0.07789, 0.00363,
-#'     0.01018, 0.07229, 0.00001,
-#'     0.00298, 0.09585, 0.00002,
-#'     0.00067, 0.11572, 0.00078),
-#'   nrow = 4,
-#'   dimnames = list(1:4, c("A", "B", "C"))
-#' )
-#'
-#' LawTable(x = x1, par = C1, law = L1)
-#'
-#' # ---- Important note on age scaling ----
-#'
-#' # The Makeham model applies internal age scaling during fitting.
-#' # If the coefficients above were estimated over ages 45-100, the life
-#' # table produced by LawTable is valid only from age 45 onward.
-#'
-#' # ---- Example 1B: correct usage ----
-#' LawTable(x = 45:100, par = c(0.00717, 0.07789, 0.00363), law = L1)
-#'
-#' # ---- Example 1C: incorrect usage ----
-#' # The code below uses the same coefficients but starts at age 25.
-#' # Because the model was fitted on scaled ages (starting at 45),
-#' # the life table at age 25 will be meaningless (e.g., e25 equals e45).
-#' \dontrun{
-#' LawTable(x = 25:100, par = c(0.00717, 0.07789, 0.00363), law = L1)
-#' }
-#'
-#' # ---- How to check which laws apply scaling ----
-#' A <- availableLaws()$table
-#' A[, c("CODE", "SCALE_X")]
-#'
-#' # Example 2 --- Heligman-Pollard (no scaling) ---
-#'
-#' x2 <- 0:110
-#' L2 <- "HP"
-#' C2 <- c(0.00223, 0.01461, 0.12292, 0.00091,
-#'         2.75201, 29.01877, 0.00002, 1.11411)
-#'
-#' LawTable(x = x2, par = C2, law = L2)
-#'
-#' # Because "HP" does NOT scale the age vector, the output is valid for
-#' # any starting age. Compare:
-#' LawTable(x = 3:110, par = C2, law = L2)
-#' # Note that e3 = 70.31 in both tables, confirming consistency.
-#'
+#' @example inst/examples/LawTable.R
 #' @export
-LawTable <- function(x, par, law, sex = NULL, lx0 = 1e5, ax = NULL) {
+LawTable <- function(x, par, law, sex = NULL, lx0 = 1e5,
+                     ax = "andreev_kingkade") {
 
-  info    <- addDetails(law)
+  info    <- law_details(law)
   scale.x <- info$scale.x
   fn      <- get(law)
   xx      <- if (scale.x) scale_x(x) else x
 
   if (is.matrix(par) | is.data.frame(par)) {
-    hx <- NULL
-    for (j in 1:nrow(par)) {
-      hxj <- fn(xx, par[j, ])$hx
-      hx  <- cbind(hx, hxj)
-    }
+    hx <- lapply(
+      X   = seq_len(nrow(par)),
+      FUN = function(j) fn(x = xx, par = unlist(par[j, ]))$hx
+      )
+    hx <- do.call(what = cbind, args = hx)
     dimnames(hx) <- list(x, rownames(par))
 
   } else {
-    hx <- fn(xx, par)$hx
+    hx <- fn(x = xx, par = par)$hx
   }
 
-  thisIndex  <- info$model["FIT"]
+  # The law is evaluated on the (possibly scaled) ages, while the life table
+  # is built on the ages the user asked for, so that lt$x echoes the input.
+  thisIndex <- info$model["FIT"]
 
   if (thisIndex == "q[x]") {
-    out <- LifeTable(x = xx, qx = hx, sex = sex, lx0 = lx0, ax = ax)
+    out <- LifeTable(x = x, qx = hx, sex = sex, lx0 = lx0, ax = ax)
   }
+
   if (thisIndex == "mu[x]") {
-    out <- LifeTable(x = xx, mx = hx, sex = sex, lx0 = lx0, ax = ax)
+    out <- LifeTable(x = x, mx = hx, sex = sex, lx0 = lx0, ax = ax)
   }
+
   out$call <- match.call()
   return(out)
 }

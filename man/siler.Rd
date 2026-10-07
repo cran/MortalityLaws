@@ -7,16 +7,17 @@
 siler(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Siler Mortality Law - 1979
+A three-term competing-risks hazard: a declining infancy term, a constant
+background term and a rising old-age term.
 }
 \examples{
 siler(x = 0:100)

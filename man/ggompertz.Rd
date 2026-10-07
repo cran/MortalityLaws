@@ -2,21 +2,22 @@
 % Please edit documentation in R/MortalityLaw_models.R
 \name{ggompertz}
 \alias{ggompertz}
-\title{Gamma-Gompertz Model as in Vaupel et al. (1979)}
+\title{Gamma-Gompertz Model - 1979}
 \usage{
 ggompertz(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Gamma-Gompertz Model as in Vaupel et al. (1979)
+The Gamma-Gompertz hazard, the marginal hazard of a Gompertz population with
+Gamma-distributed frailty; the frailty produces the old-age levelling-off.
 }
 \examples{
 ggompertz(x = 50:120)

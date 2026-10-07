@@ -7,16 +7,17 @@
 rogersplanck(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Rogers-Planck Model - 1983
+A parametric whole-lifespan schedule with infancy, middle-age hump and old-
+age terms, developed for model life tables.
 }
 \examples{
 rogersplanck(x = 0:100)

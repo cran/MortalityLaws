@@ -7,16 +7,17 @@
 kannisto_makeham(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Kannisto-Makeham Mortality Law - 1998
+The Kannisto logistic hazard plus a constant, for the age-independent
+component above the logistic ceiling.
 }
 \examples{
 kannisto_makeham(x = 85:120)

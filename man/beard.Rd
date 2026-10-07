@@ -7,16 +7,17 @@
 beard(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Beard Model - 1971
+The Beard logistic hazard, \eqn{\mu_x = A \exp(Bx) / (1 + K A \exp(Bx))},
+which levels off at old age.
 }
 \examples{
 beard(x = 50:100)

@@ -7,16 +7,17 @@
 strehler_mildvan(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Strehler-Mildvan Model - 1960
+The Strehler-Mildvan form, from a model of declining vitality with age; it
+predicts a negative intercept-slope correlation across populations.
 }
 \examples{
 strehler_mildvan(x = 30:85)

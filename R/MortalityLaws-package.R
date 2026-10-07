@@ -9,15 +9,11 @@
 #' To learn more about the package, start with the vignettes:
 #' \code{browseVignettes(package = "MortalityLaws")}
 #'
-#' @importFrom RCurl getURL
-#' @importFrom tidyr spread
-#' @importFrom graphics plot abline axis barplot box hist layout legend lines par rect
-#' @importFrom utils read.table read.csv head tail
-#' @importFrom stats fitted coef optim predict quantile nlminb pt printCoefmat
-#' df.residual qt vcov
+#' @importFrom graphics plot abline axis box hist layout legend lines mtext par points rect title
+#' @importFrom utils read.table head tail
+#' @importFrom stats fitted coef optim predict quantile nlminb residuals df.residual lowess sd dnorm qnorm qqnorm
 #' @importFrom pbapply startpb closepb setpb
-#' @importFrom methods is
-#' @import rvest httr
+#' @importFrom httr GET POST set_cookies cookies content status_code timeout
 #' @name MortalityLaws
 #' @docType package
 "_PACKAGE"

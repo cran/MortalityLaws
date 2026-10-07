@@ -1,13 +1,12 @@
 ## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(MortalityLaws)
-library(knitr)
-opts_chunk$set(collapse = TRUE)
 
-## ----LoadPackages, message=FALSE----------------------------------------------
+## -----------------------------------------------------------------------------
 library(MortalityLaws)
+data(ahmd)
 
 ## ----ReadHMD, eval=FALSE------------------------------------------------------
-# # Download Swedish death counts (ages 0–110, years 1751–2014)
 # HMD_Dx <- ReadHMD(
 #   what      = "Dx",
 #   countries = "SWE",
@@ -16,6 +15,34 @@ library(MortalityLaws)
 #   password  = "password",
 #   save      = FALSE
 # )
+
+## ----RegionalReaders, eval=FALSE----------------------------------------------
+# JMD_LT <- ReadJMD(       # Japanese prefectures: female life tables
+#   what     = "LT_f",
+#   regions  = c("Aichi", "Tokyo"),
+#   interval = "1x1",
+#   save     = FALSE
+# )
+# 
+# CHMD_mx <- ReadCHMD(     # Canadian regions: death rates
+#   what     = "mx",
+#   regions  = "CAN",
+#   interval = "1x1",
+#   save     = FALSE
+# )
+# 
+# AHMD_Ex <- ReadAHMD(     # Australian states: exposures
+#   what     = "Ex",
+#   regions  = c("NSW", "VIC"),
+#   interval = "1x1",
+#   save     = FALSE
+# )
+
+## ----availableHMD, eval=FALSE-------------------------------------------------
+# availableHMD()
+
+## -----------------------------------------------------------------------------
+names(HMD_sample)
 
 ## -----------------------------------------------------------------------------
 year     <- 1950
@@ -32,15 +59,12 @@ fit <- MortalityLaw(
 )
 
 ## -----------------------------------------------------------------------------
-ls(fit)   # components of the fitted object
-
-## -----------------------------------------------------------------------------
 summary(fit)
 
-## ----fig.align='center', out.width='80%', fig.width=9-------------------------
+## -----------------------------------------------------------------------------
 plot(fit)
 
-## ----fig.align='center', out.width='80%', fig.width=9-------------------------
+## -----------------------------------------------------------------------------
 fit.subset <- MortalityLaw(
   x          = ages,
   Dx         = deaths,
@@ -51,24 +75,32 @@ fit.subset <- MortalityLaw(
 )
 plot(fit.subset)
 
-## ----eval=FALSE---------------------------------------------------------------
-# # Fit with automatic age scaling
-# fit_scaled <- MortalityLaw(
-#   x          = ages,
-#   Dx         = deaths,
-#   Ex         = exposure,
-#   law        = "gompertz",
-#   scale.age  = TRUE
-# )
-
-## ----eval=FALSE, warning=FALSE------------------------------------------------
-# availableLaws()
-
-## ----message=FALSE, warning=FALSE---------------------------------------------
-availableLF()
+## -----------------------------------------------------------------------------
+A <- availableLaws()$table
+A[as.logical(A$SCALE_X), c("NAME", "CODE")]
 
 ## -----------------------------------------------------------------------------
-my_gompertz <- function(x, par = c(b = 0.13, M = 45)){
+ages.makeham <- 40:90
+fit.makeham  <- MortalityLaw(
+  x          = ages.makeham,
+  Dx         = ahmd$Dx[paste(ages.makeham), "2010"],
+  Ex         = ahmd$Ex[paste(ages.makeham), "2010"],
+  law        = "makeham",
+  opt.method = "LF2"
+)
+p <- coef(fit.makeham)
+p
+
+## -----------------------------------------------------------------------------
+x_scaled <- ages.makeham - min(ages.makeham) + 1
+by_hand  <- p["A"] * exp(p["B"] * x_scaled) + p["C"]
+max(abs(by_hand - fitted(fit.makeham)))
+
+by_hand_unscaled <- p["A"] * exp(p["B"] * ages.makeham) + p["C"]
+max(abs(by_hand_unscaled - fitted(fit.makeham)))
+
+## -----------------------------------------------------------------------------
+missov <- function(x, par = c(b = 0.13, M = 45)) {
   hx <- with(as.list(par), b * exp(b * (x - M)))
   return(as.list(environment()))   # must return a list
 }
@@ -79,45 +111,23 @@ ages     <- 45:85
 deaths   <- ahmd$Dx[paste(ages), paste(year)]
 exposure <- ahmd$Ex[paste(ages), paste(year)]
 
-## ----warning=FALSE, results='hide'--------------------------------------------
 my_model <- MortalityLaw(
   x          = ages,
   Dx         = deaths,
   Ex         = exposure,
-  custom.law = my_gompertz
+  custom.law = missov
 )
 
 ## -----------------------------------------------------------------------------
 summary(my_model)
 
-## -----------------------------------------------------------------------------
-plot(my_model)
+## ----warning = FALSE, message = FALSE-----------------------------------------
+lt <- LawTable(x = 0:100, par = fit$coefficients, law = "HP")
+head(lt$lt)
 
 ## -----------------------------------------------------------------------------
-y  <- 1900
-x  <- as.numeric(rownames(ahmd$mx))
-Dx <- ahmd$Dx[, paste(y)]
-Ex <- ahmd$Ex[, paste(y)]
-
-LT1 <- LifeTable(x, Dx = Dx, Ex = Ex)   # primary input
-LT2 <- LifeTable(x, mx = LT1$lt$mx)     # from mx
-LT3 <- LifeTable(x, qx = LT1$lt$qx)     # from qx
-LT4 <- LifeTable(x, lx = LT1$lt$lx)     # from lx
-LT5 <- LifeTable(x, dx = LT1$lt$dx)     # from dx
-
-LT1
+citation(package = "MortalityLaws")
 
 ## -----------------------------------------------------------------------------
-ls(LT1)   # components of the life table object
-
-## -----------------------------------------------------------------------------
-x  <- c(0, 1, seq(5, 110, by = 5))
-mx <- c(.053, .005, .001, .0012, .0018, .002, .003, .004, 
-       .004, .005, .006, .0093, .0129, .019, .031, .049, 
-       .084, .129, .180, .2354, .3085, .390, .478, .551)
-
-lt <- LifeTable(x, mx = mx, sex = "female")
-
-## -----------------------------------------------------------------------------
-lt
+sessionInfo()
 

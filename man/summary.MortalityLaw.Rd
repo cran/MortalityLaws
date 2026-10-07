@@ -2,21 +2,42 @@
 % Please edit documentation in R/MortalityLaw_S3.R
 \name{summary.MortalityLaw}
 \alias{summary.MortalityLaw}
-\title{Summary MortalityLaw}
+\title{Summarise a Fitted Mortality Law}
 \usage{
 \method{summary}{MortalityLaw}(object, ..., digits = max(3L, getOption("digits") - 3L))
 }
 \arguments{
-\item{object}{an object of class \code{"MortalityLaw"}}
+\item{object}{An object of class \code{"MortalityLaw"}.}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{Additional arguments affecting the summary produced.}
 
-\item{digits}{number of digits to display.}
+\item{digits}{Number of significant digits to display.}
 }
 \value{
-A list of model diagnosis
+An object of class \code{"summary.MortalityLaw"}, a list holding
+  the model information, the matched call, the rounded coefficients, the
+  goodness-of-fit measures, the deviance and the degrees of freedom, the
+  R-squared and RMSE of the fit, the optimisation outcome, the fit window
+  and the residual summaries on the raw and the deviance scale.
 }
 \description{
-Summary MortalityLaw
+Collects the fitted coefficients, the fit measures and a summary of the
+residuals into a compact object for printing, and rounds them to
+\code{digits}. The fit measures cover the fit window (the ages fitted and
+the ages reported), the optimisation (method used, optimiser outcome), the
+deviance with its degrees of freedom and dispersion, and the
+R-squared and RMSE of the fit. For a likelihood-based fit the maximised
+log-likelihood with its information criteria is included. When more than
+four curves were fitted only the first and the last two are kept in the
+printed coefficients and fit measures, so the output fits on one screen.
 }
-\keyword{internal}
+\examples{
+x  <- 45:75
+M1 <- MortalityLaw(x = x, Dx = ahmd$Dx[as.character(x), "1950"],
+                   Ex = ahmd$Ex[as.character(x), "1950"], law = "makeham")
+summary(M1)
+}
+\seealso{
+\code{\link{MortalityLaw}} to fit a law;
+  \code{\link{coef}} and \code{\link{fitted}} for the extracted values.
+}

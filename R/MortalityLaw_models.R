@@ -1,21 +1,43 @@
 # --------------------------------------------
 # Author: Marius D PASCARIU
-# Date: 2026-05-04 23:32:44
+# Date: 2026-10-04 17:46:32
 # --------------------------------------------
 
 # ---- LAWS ---------------------------------------
 
+#' De Moivre Mortality Law - 1725
+#'
+#' The oldest law in the catalogue: survivorship falls linearly to zero at a
+#' limiting age, \eqn{l_x = N - x}, so the hazard rises steeply as age
+#' approaches \eqn{N}, \eqn{\mu_x = 1/(N - x)}. A historical baseline rather
+#' than a curve to graduate data with. USE WITH CARE: the hazard is defined
+#' only below \eqn{N}, so a prediction past the fitted ages can be negative,
+#' and \code{\link{MortalityLaw}} warns whenever it fits this law.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples demoivre(x = 0:95)
+#' @keywords internal
+#' @export
+demoivre <- function(x, par = NULL){
+  par <- bring_parameters(law = 'demoivre', par = par)
+  hx  <- 1/(par[['N']] - x)
+  return(list(hx = hx, par = par))
+}
+
+
 #' Gompertz Mortality Law - 1825
 #'
-#' @param x vector of age at the beginning of the age classes
-#' @param par parameters of the selected model. If NULL the
-#' default values will be assigned automatically.
+#' The exponential rise of mortality with age, the classic adult and old-age
+#' law. The hazard is unbounded, so fit it over the adult ages.
+#' @param x vector of age at the beginning of the age classes.
+#' @param par parameters of the selected model. If \code{NULL} the default
+#'   values are assigned automatically.
+#' @return A list of rates and model parameters.
 #' @examples gompertz(x = 45:90)
-#' @return A list of rates and model parameters
 #' @keywords internal
 #' @export
 gompertz <- function(x, par = NULL){
-  par <- bring_parameters('gompertz', par)
+  par <- bring_parameters(law = 'gompertz', par = par)
   hx  <- with(as.list(par), A*exp(B*x) )
   Hx  <- with(as.list(par), A/B * (exp(B*x) - 1) )
   Sx  <- exp(-Hx)
@@ -24,13 +46,17 @@ gompertz <- function(x, par = NULL){
 
 
 #' Gompertz Mortality Law - informative parameterization
+#'
+#' The Gompertz hazard in terms of its mode \eqn{M} and dispersion
+#' \eqn{\sigma}, \eqn{\mu_x = (1/\sigma) \exp((x - M)/\sigma)}; the same curve
+#' as \code{gompertz} with coefficients that read off the plot.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples gompertz0(x = 45:90)
 #' @keywords internal
 #' @export
 gompertz0 <- function(x, par = NULL){
-  par <- bring_parameters('gompertz0', par)
+  par <- bring_parameters(law = 'gompertz0', par = par)
   hx  <- with(as.list(par), (1/sigma) * exp((x - M)/sigma) )
   Hx  <- with(as.list(par), exp(-M/sigma) * (exp(x/sigma) - 1) )
   Sx  <- exp(-Hx)
@@ -39,15 +65,15 @@ gompertz0 <- function(x, par = NULL){
 
 #' Inverse-Gompertz Mortality Law - informative parameterization
 #'
-#' m - is a measure of location because it is the mode of the density, m > 0
-#' sigma - represents the dispersion of the density about the mode, sigma > 0
-#' @inheritParams gompertz 
+#' The inverse-Gompertz hazard, which falls with age; it describes the decline
+#' of mortality after the infant peak.
+#' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples invgompertz(x = 15:25)
 #' @keywords internal
 #' @export
 invgompertz <- function(x, par = NULL){
-  par <- bring_parameters('invgompertz', par)
+  par <- bring_parameters(law = 'invgompertz', par = par)
   hx  <- with(as.list(par), 1/sigma * exp(-(x - M)/sigma) / (exp(exp(-(x - M)/sigma)) - 1))
   Sx  <- with(as.list(par), (1 - exp(-exp(-(x - M)/sigma))) / (1 - exp(-exp(M/sigma))))
   Hx  <- -log(Sx)
@@ -55,28 +81,34 @@ invgompertz <- function(x, par = NULL){
 }
 
 #' Makeham Mortality Law - 1860
+#'
+#' The Gompertz hazard plus a constant, \eqn{\mu_x = A \exp(Bx) + C}, so that
+#' the age-independent component of mortality is represented too.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples makeham(x = 45:90)
 #' @keywords internal
 #' @export
 makeham <- function(x, par = NULL){
-  par <- bring_parameters('makeham', par)
+  par <- bring_parameters(law = 'makeham', par = par)
   hx  <- with(as.list(par), A*exp(B*x) + C)
   Hx  <- with(as.list(par), A/B * (exp(B*x) - 1) + x*C )
   Sx  <- exp(-Hx)
-  return(list(hx = hx, par = par))
+  return(list(hx = hx, par = par, Sx = Sx))
 }
 
 
 #' Makeham Mortality Law - informative parameterization
+#'
+#' The Makeham hazard with the exponential term in mode/dispersion form,
+#' \eqn{\mu_x = (1/\sigma) \exp((x - M)/\sigma) + C}.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples makeham0(x = 45:90)
 #' @keywords internal
 #' @export
 makeham0 <- function(x, par = NULL){
-  par <- bring_parameters('makeham0', par)
+  par <- bring_parameters(law = 'makeham0', par = par)
   hx <- with(as.list(par), (1/sigma) * exp((x - M)/sigma) + C)
   Hx <- with(as.list(par), exp(-M/sigma) * (exp(x/sigma) - 1) + x*C)
   Sx <- exp(-Hx)
@@ -85,13 +117,21 @@ makeham0 <- function(x, par = NULL){
 
 
 #' Opperman Mortality Law - 1870
+#'
+#' A three-term hazard across the whole lifespan, \eqn{\mu_x = A/\sqrt{x + 1} -
+#' B + C\sqrt{x + 1}}, evaluated at ages shifted by one year so the term stays
+#' finite at age 0. THIS SIGN IS A CHOICE: the published form writes the middle
+#' term with a free sign (\eqn{+b}); the engine estimates on the log scale and
+#' so requires positivity, hence the \code{- B} (\eqn{b = -B < 0}) branch,
+#' which is the branch mortality data occupy. See the opperman entry of
+#' \code{\link{availableLaws}}.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples opperman(x = 1:25)
 #' @keywords internal
 #' @export
 opperman <- function(x, par = NULL){
-  par <- bring_parameters('opperman', par)
+  par <- bring_parameters(law = 'opperman', par = par)
   x  <- x + 1
   hx <- with(as.list(par), A/sqrt(x) - B + C*sqrt(x))
   hx <- pmax(0, hx)
@@ -100,29 +140,35 @@ opperman <- function(x, par = NULL){
 
 
 #' Thiele Mortality Law - 1871
+#'
+#' A three-component hazard over the whole lifespan: a declining infancy term,
+#' a Gaussian accident hump and a rising old-age term.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples thiele(x = 0:100)
 #' @keywords internal
 #' @export
 thiele <- function(x, par = NULL){
-  par <- bring_parameters('thiele', par)
+  par <- bring_parameters(law = 'thiele', par = par)
   mu1 <- with(as.list(par), A*exp(-B*x) )
   mu2 <- with(as.list(par), C*exp(-.5*D*(x - E)^2) )
   mu3 <- with(as.list(par), F_*exp(G*x) )
-  hx <- ifelse(x == 0, mu1 + mu3, mu1 + mu2 + mu3)
+  hx  <- mu1 + mu2 + mu3
   return(list(hx = hx, par = par))
 }
 
 
 #' Wittstein Mortality Law - 1883
+#'
+#' A two-term law giving a death probability rather than a hazard, \eqn{q_x =
+#' (1/B) A^{-(Bx)^N} + A^{-(M - x)^N}}, so it covers both ends of the lifespan.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples wittstein(x = 0:100)
 #' @keywords internal
 #' @export
 wittstein <- function(x, par = NULL){
-  par <- bring_parameters('wittstein', par)
+  par <- bring_parameters(law = 'wittstein', par = par)
   hx  <- with(as.list(par), (1/B)*A^-((B*x)^N) + A^-((M - x)^N) )
   return(list(hx = hx, par = par))
 }
@@ -130,20 +176,19 @@ wittstein <- function(x, par = NULL){
 
 #' Weibull Mortality Law - 1939
 #'
-#' Note that if sigma > m, then the mode of the density is 0 and hx is a
-#' non-increasing function of x, while if sigma < m, then the mode is
-#' greater than 0 and hx is an increasing function.
-#' m > 0 is a measure of location
-#' sigma > 0 is measure of dispersion
+#' The Weibull hazard; increasing when \eqn{\sigma < M}, non-increasing
+#' otherwise. NOT DEFINED AT BIRTH: the hazard is 0 when the shape is greater
+#' than one and unbounded when it is smaller, so age 0 is reported as missing
+#' and carries no weight in the fit; fit the law from age 1.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples weibull(x = 1:20)
 #' @keywords internal
 #' @export
 weibull <- function(x, par = NULL){
-  par <- bring_parameters('weibull', par)
+  par <- bring_parameters(law = 'weibull', par = par)
   hx <- with(as.list(par), 1/sigma * (x/M)^(M/sigma - 1) )
-  hx[x == 0] <- 1
+  hx[x == 0] <- NA_real_
   Hx <- with(as.list(par), (x/M)^(M/sigma) )
   Sx <- exp(-Hx)
   return(list(hx = hx, par = par, Sx = Sx))
@@ -152,17 +197,15 @@ weibull <- function(x, par = NULL){
 
 #' Inverse-Weibull Mortality Law
 #'
-#' The Inverse-Weibull proves useful for modelling the childhood and teenage years,
-#' because the logarithm of h(x) is a concave function.
-#' m > 0 is a measure of location
-#' sigma > 0 is measure of dispersion
+#' The inverse-Weibull hazard; useful for childhood and the teenage years,
+#' where the logarithm of the hazard is concave.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples invweibull(x = 1:20)
 #' @keywords internal
 #' @export
 invweibull <- function(x, par = NULL){
-  par <- bring_parameters('invweibull', par)
+  par <- bring_parameters(law = 'invweibull', par = par)
   hx <- with(as.list(par),
              (1/sigma) * (x/M)^(-M/sigma - 1) / (exp((x/M)^(-M/sigma)) - 1) )
   Hx <- with(as.list(par), -log(1 - exp(-(x/M)^(-M/sigma))) )
@@ -172,130 +215,252 @@ invweibull <- function(x, par = NULL){
 
 
 #' Perks Model - 1932
+#'
+#' The Perks logistic hazard, \eqn{\mu_x = (A + B C^x) / (1 + D C^x)}, which
+#' flattens the Gompertz rise at the oldest ages.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples perks(x = 50:100)
 #' @keywords internal
 #' @export
 perks <- function(x, par = NULL){
-  par <- bring_parameters('perks', par)
-  hx  <- with(as.list(par), (A + B*C^x) / (B*(C^-x) + 1 + D*C^x) )
+  par <- bring_parameters(law = 'perks', par = par)
+  hx  <- with(as.list(par), (A + B*C^x) / (1 + D*C^x))
+  return(list(hx = hx, par = par))
+}
+
+
+#' Steffensen Model - 1930
+#'
+#' The Perks hazard with an extra \code{B*C^-x} denominator term that peaks at
+#' birth and decays geometrically, so the hazard is dampened at young ages and
+#' converges to Perks at old ages. ATTRIBUTION IS UNVERIFIED: the citation to
+#' Steffensen (1930) is real, but whether the 1930 text contains this form is
+#' not (the scan is paywalled), so it is documented as attributed.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples steffensen(x = 0:100)
+#' @keywords internal
+#' @export
+steffensen <- function(x, par = NULL){
+  par <- bring_parameters(law = 'steffensen', par = par)
+  hx  <- with(as.list(par), (A + B*C^x) / (B*(C^-x) + 1 + D*C^x))
+  return(list(hx = hx, par = par))
+}
+
+
+#' Negative Gompertz Mortality Law - 1871
+#'
+#' The Gompertz hazard with a negative exponent, the hazard of a negative
+#' Gompertz distribution; proposed by Thiele for the risk of death prior to
+#' maturity, and reused by Siler.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples neggompertz(x = 0:20)
+#' @keywords internal
+#' @export
+neggompertz <- function(x, par = NULL){
+  par <- bring_parameters(law = 'neggompertz', par = par)
+  hx  <- with(as.list(par), A*exp(-B*x) )
+  return(list(hx = hx, par = par))
+}
+
+
+#' Pareto II Mortality Law - 1954
+#'
+#' The hazard of a Pareto type II (Lomax) distribution, \eqn{\mu_x = A / (x +
+#' C)}; a shifted power hazard with the exponent fixed at one.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples pareto_2(x = 1:20)
+#' @keywords internal
+#' @export
+pareto_2 <- function(x, par = NULL){
+  par <- bring_parameters(law = 'pareto_2', par = par)
+  hx  <- with(as.list(par), A/(x + C) )
+  return(list(hx = hx, par = par))
+}
+
+
+#' Shifted Power Mortality Law - 2019
+#'
+#' The Scholey flexibly-shifted power hazard, \eqn{\mu_x = A (x + C)^{-B}}; a
+#' shifted Weibull hazard, and the truncated-power law with the exponential
+#' term switched off.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples scholey_shifted_power(x = 0:10)
+#' @keywords internal
+#' @export
+scholey_shifted_power <- function(x, par = NULL){
+  par <- bring_parameters(law = 'scholey_shifted_power', par = par)
+  hx  <- with(as.list(par), A*(x + C)^(-B) )
+  return(list(hx = hx, par = par))
+}
+
+
+#' Scholey Mortality Law - 2019
+#'
+#' The Scholey exponentially-truncated power hazard, \eqn{\mu_x = A (x +
+#' C)^{-B} \exp(-Dx)}, the best-fitting parametric form on his day-level US
+#' infant data; it nests the negative Gompertz, Pareto II, shifted power and
+#' shifted Weibull hazards. AGE RESOLUTION MATTERS: \code{D} is identified only
+#' on day- or week-level data over the first year; on single years of age it
+#' collapses to the boundary and the fit reduces to
+#' \code{scholey_shifted_power}, in which case the engine warns.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples scholey(x = seq(0, 1, by = 1/12))
+#' @keywords internal
+#' @export
+scholey <- function(x, par = NULL){
+  par <- bring_parameters(law = 'scholey', par = par)
+  hx  <- with(as.list(par), A*(x + C)^(-B)*exp(-D*x) )
   return(list(hx = hx, par = par))
 }
 
 
 #' Van der Maen Model - 1943
+#'
+#' A quadratic hazard with a reciprocal closing term, \eqn{\mu_x = A + Bx +
+#' Cx^2 + I/(N - x)}, so the table can close at a finite age \eqn{N}.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples vandermaen(x = 0:100)
 #' @keywords internal
 #' @export
 vandermaen <- function(x, par = NULL){
-  par <- bring_parameters('vandermaen', par)
-  hx  <- with(as.list(par), A + B*x + C*(x^2) + I/(N - x))
+  par <- bring_parameters(law = 'vandermaen', par = par)
+  d   <- par[['N']] - x
+  hx  <- with(as.list(par), A + B*x + C*(x^2) + ifelse(d > 0, I/d, NA_real_))
   return(list(hx = hx, par = par))
 }
 
 
 #' Van der Maen 2 Model - 1943
+#'
+#' The linear form of the Van der Maen hazard with the same reciprocal closing
+#' term, \eqn{\mu_x = A + Bx + I/(N - x)}.
 #' @inheritParams gompertz
 #' @inherit gompertz return
-#' @examples vandermaen(x = 0:100)
+#' @examples vandermaen2(x = 0:100)
 #' @keywords internal
 #' @export
 vandermaen2 <- function(x, par = NULL){
-  par <- bring_parameters('vandermaen2', par)
-  hx  <- with(as.list(par), A + B*x + I/(N - x))
+  par <- bring_parameters(law = 'vandermaen2', par = par)
+  d   <- par[['N']] - x
+  hx  <- with(as.list(par), A + B*x + ifelse(d > 0, I/d, NA_real_))
   return(list(hx = hx, par = par))
 }
 
 
 #' Strehler-Mildvan Model - 1960
+#'
+#' The Strehler-Mildvan form, from a model of declining vitality with age; it
+#' predicts a negative intercept-slope correlation across populations.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples strehler_mildvan(x = 30:85)
 #' @keywords internal
 #' @export
 strehler_mildvan <- function(x, par = NULL){
-  par <- bring_parameters('strehler_mildvan', par)
-  hx  <- with(as.list(par), K * exp(-V0 * (1 - B * x)/D) )
+  par <- bring_parameters(law = 'strehler_mildvan', par = par)
+  hx  <- with(as.list(par), A*exp(B*x)*exp(-(V/B)*(1 - exp(-B*x))) )
   return(list(hx = hx, par = par))
 }
 
 
 #' Beard Model - 1971
+#'
+#' The Beard logistic hazard, \eqn{\mu_x = A \exp(Bx) / (1 + K A \exp(Bx))},
+#' which levels off at old age.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples beard(x = 50:100)
 #' @keywords internal
 #' @export
 beard <- function(x, par = NULL){
-  par <- bring_parameters('beard', par)
+  par <- bring_parameters(law = 'beard', par = par)
   hx  <- with(as.list(par), (A*exp(B*x)) / (1 + K*A*exp(B*x)) )
   return(list(hx = hx, par = par))
 }
 
 
 #' Makeham-Beard Model - 1971
+#'
+#' The Beard logistic hazard plus a constant, covering the age-independent
+#' component and the old-age levelling-off.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples beard_makeham(x = 0:100)
 #' @keywords internal
 #' @export
 beard_makeham <- function(x, par = NULL){
-  par <- bring_parameters('beard_makeham', par)
+  par <- bring_parameters(law = 'beard_makeham', par = par)
   hx  <- with(as.list(par), A*exp(B*x) / (1 + K*A*exp(B*x)) + C)
   return(list(hx = hx, par = par))
 }
 
 
-#' Gamma-Gompertz Model as in Vaupel et al. (1979)
+#' Gamma-Gompertz Model - 1979
+#'
+#' The Gamma-Gompertz hazard, the marginal hazard of a Gompertz population with
+#' Gamma-distributed frailty; the frailty produces the old-age levelling-off.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples ggompertz(x = 50:120)
 #' @keywords internal
 #' @export
 ggompertz <- function(x, par = NULL){
-  par <- bring_parameters('ggompertz', par)
+  par <- bring_parameters(law = 'ggompertz', par = par)
   hx  <- with(as.list(par), (A*exp(B*x)) / (1 + (A*G/B)*(exp(B*x) - 1)) )
   return(list(hx = hx, par = par))
 }
 
 
 #' Quadratic Model
+#'
+#' A plain quadratic hazard, \eqn{\mu_x = A + Bx + Cx^2}; a smooth baseline
+#' over the adult ages that cannot level off at the oldest ages.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples quadratic(x = 0:100)
 #' @keywords internal
 #' @export
 quadratic <- function(x, par = NULL){
-  par <- bring_parameters('quadratic', par)
+  par <- bring_parameters(law = 'quadratic', par = par)
   hx  <- with(as.list(par), A + B*x + C*(x^2))
   return(list(hx = hx, par = par))
 }
 
 
 #' Siler Mortality Law - 1979
+#'
+#' A three-term competing-risks hazard: a declining infancy term, a constant
+#' background term and a rising old-age term.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples siler(x = 0:100)
 #' @keywords internal
 #' @export
 siler <- function(x, par = NULL){
-  par <- bring_parameters('siler', par)
+  par <- bring_parameters(law = 'siler', par = par)
   hx <- with(as.list(par), A*exp(-B*x) + C + D*exp(E*x))
   return(list(hx = hx, par = par))
 }
 
 
 #' Heligman-Pollard Mortality Law - 8 parameters - 1980
+#'
+#' The Heligman-Pollard eight-parameter law of the whole lifespan, fitted on
+#' the odds of dying \eqn{q_x/p_x}; the fitted quantity is a death probability.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples HP(x = 0:100)
 #' @keywords internal
 #' @export
 HP <- function(x, par = NULL){
-  par <- bring_parameters('HP', par)
+  par <- bring_parameters(law = 'HP', par = par)
   mu1 <- with(as.list(par), A^((x + B)^C) + G*H^x )
   mu2 <- with(as.list(par), D*exp(-E*(log(x/F_))^2) )
   eta <- ifelse(x == 0, mu1, mu1 + mu2)
@@ -304,13 +469,16 @@ HP <- function(x, par = NULL){
 }
 
 #' Heligman-Pollard 2 Mortality Law - 8 parameters
+#'
+#' The Heligman-Pollard law with a logistic old-age term, which keeps the
+#' hazard bounded.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples HP2(x = 0:100)
 #' @keywords internal
 #' @export
 HP2 <- function(x, par = NULL){
-  par <- bring_parameters('HP2', par)
+  par <- bring_parameters(law = 'HP2', par = par)
   mu1 <- with(as.list(par), A^((x + B)^C) + (G*H^x)/(1 + G*H^x) )
   mu2 <- with(as.list(par), D*exp(-E*(log(x/F_))^2) )
   eta <- ifelse(x == 0, mu1, mu1 + mu2)
@@ -319,13 +487,16 @@ HP2 <- function(x, par = NULL){
 }
 
 #' Heligman-Pollard 3 Mortality Law - 9 parameters
+#'
+#' The Heligman-Pollard law with an extra parameter in the old-age term, making
+#' it a full logistic that bends at the oldest ages.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples HP3(x = 0:100)
 #' @keywords internal
 #' @export
 HP3 <- function(x, par = NULL){
-  par <- bring_parameters('HP3', par)
+  par <- bring_parameters(law = 'HP3', par = par)
   mu1 <- with(as.list(par), A^((x + B)^C) + (G*H^x)/(1 + K*G*H^x) )
   mu2 <- with(as.list(par), D*exp(-E*(log(x/F_))^2) )
   eta <- ifelse(x == 0, mu1, mu1 + mu2)
@@ -334,13 +505,16 @@ HP3 <- function(x, par = NULL){
 }
 
 #' Heligman-Pollard 4 Mortality Law - 9 parameters
+#'
+#' The Heligman-Pollard law with an extra exponent on the age in the old-age
+#' term, so the rise in the hazard can accelerate.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples HP4(x = 0:100)
 #' @keywords internal
 #' @export
 HP4 <- function(x, par = NULL){
-  par <- bring_parameters('HP4', par)
+  par <- bring_parameters(law = 'HP4', par = par)
   mu1 <- with(as.list(par), A^((x + B)^C) + (G*H^(x^K)) / (1 + G*H^(x^K)) )
   mu2 <- with(as.list(par), D*exp(-E*(log(x/F_))^2) )
   eta <- ifelse(x == 0, mu1, mu1 + mu2)
@@ -350,53 +524,81 @@ HP4 <- function(x, par = NULL){
 
 
 #' Martinelle Model - 1987
+#'
+#' A generalisation of the Perks formula for old age, with an extra linear term
+#' that lets the hazard keep some exponential rise above the logistic plateau.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples martinelle(x = 0:100)
 #' @keywords internal
 #' @export
 martinelle <- function(x, par = NULL){
-  par <- bring_parameters('martinelle', par)
+  par <- bring_parameters(law = 'martinelle', par = par)
   hx  <- with(as.list(par), (A*exp(B*x) + C) / (1 + D*exp(B*x)) + K*exp(B*x))
   return(list(hx = hx, par = par))
 }
 
 
 #' Rogers-Planck Model - 1983
+#'
+#' A parametric whole-lifespan schedule with infancy, middle-age hump and old-
+#' age terms, developed for model life tables.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples rogersplanck(x = 0:100)
 #' @keywords internal
 #' @export
 rogersplanck <- function(x, par = NULL){
-  par <- bring_parameters('rogersplanck', par)
+  par <- bring_parameters(law = 'rogersplanck', par = par)
   hx  <- with(as.list(par),
           A0 + A1*exp(-A*x) + A2*exp(B*(x - U) - exp(-C*(x - U))) + A3*exp(D*x))
   return(list(hx = hx, par = par))
 }
 
 
+#' Normalise Carriere Mixture Weights to the Simplex
+#'
+#' Clamps the first two weights into (0, 1) and rescales them proportionally
+#' so that the third weight stays positive.
+#' @param P1,P2 Weights of the first two mixture components (numeric).
+#' @return Named numeric vector with the normalised weights P1, P2 and P3.
+#' @noRd
+carriere_weights <- function(P1, P2) {
+  f1 <- min(max(P1, 1e-4), 1)
+  f2 <- min(max(P2, 1e-4), 1)
+
+  if (f1 + f2 > 1 - 1e-4) {
+    scaling <- (1 - 1e-4) / (f1 + f2)
+    f1 <- f1 * scaling
+    f2 <- f2 * scaling
+  }
+
+  f3 <- 1 - f1 - f2
+  return(c(P1 = f1, P2 = f2, P3 = f3))
+}
+
+
 #' Carriere Mortality Law - 1992
 #'
-#' Carriere1 = weibull + invweibull + gompertz
+#' A mixture law: Weibull + inverse-Weibull + Gompertz components combined on
+#' the survivorship, with the mixture weights normalised to the simplex.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples carriere1(x = 0:100)
 #' @keywords internal
 #' @export
 carriere1 <- function(x, par = NULL){
-  par <- bring_parameters('carriere1', par)
+  par <- bring_parameters(law = 'carriere1', par = par)
   # Compute distribution functions
-  S_wei  <- weibull(x, par[c('sigma1', 'M1')])$Sx
-  S_iwei <- invweibull(x, par[c('sigma1', 'M2')])$Sx
-  S_gom  <- gompertz0(x, par[c('sigma3', 'M3')])$Sx
+  S_wei  <- weibull(x = x, par = unname(par[c('sigma1', 'M1')]))$Sx
+  S_iwei <- invweibull(x = x, par = unname(par[c('sigma2', 'M2')]))$Sx
+  S_gom  <- gompertz0(x = x, par = unname(par[c('sigma3', 'M3')]))$Sx
 
-  f1 <- par['P1'] <- max(0.0001, min(par['P1'], 1))
-  f2 <- par['P2'] <- max(0.0001, min(par['P2'], 1))
-  f3 <- 1 - f1 - f2
+  w <- carriere_weights(P1 = par[['P1']], P2 = par[['P2']])
+  par['P1'] <- w[['P1']]
+  par['P2'] <- w[['P2']]
 
-  Sx <- f1*S_wei + f2*S_iwei + f3*S_gom
-  Sx <- pmax(0, pmin(1, Sx))
+  Sx <- w[['P1']]*S_wei + w[['P2']]*S_iwei + w[['P3']]*S_gom
   Hx <- -log(Sx)
   hx <- c(Hx[1], diff(Hx)) # here we will need a numerical solution!
   return(list(hx = hx, par = par))
@@ -405,25 +607,25 @@ carriere1 <- function(x, par = NULL){
 
 #' Carriere Mortality Law - 1992
 #'
-#' Carriere2 = weibull + invgompertz + gompertz
+#' A mixture law: Weibull + inverse-Gompertz + Gompertz components combined on
+#' the survivorship, with the mixture weights normalised to the simplex.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples carriere2(x = 0:100)
 #' @keywords internal
 #' @export
 carriere2 <- function(x, par = NULL){
-  par <- bring_parameters('carriere2', par)
+  par <- bring_parameters(law = 'carriere2', par = par)
   # Compute distribution functions
-  S_wei  <- weibull(x, par[c('sigma1', 'M1')])$Sx
-  S_igom <- invgompertz(x, par[c('sigma2', 'M2')])$Sx
-  S_gom  <- gompertz0(x, par[c('sigma3', 'M3')])$Sx
+  S_wei  <- weibull(x = x, par = unname(par[c('sigma1', 'M1')]))$Sx
+  S_igom <- invgompertz(x = x, par = unname(par[c('sigma2', 'M2')]))$Sx
+  S_gom  <- gompertz0(x = x, par = unname(par[c('sigma3', 'M3')]))$Sx
 
-  f1 <- par['P1'] <- max(0.0001, min(par['P1'], 1))
-  f2 <- par['P2'] <- max(0.0001, min(par['P2'], 1))
-  f3 <- 1 - f1 - f2
+  w <- carriere_weights(P1 = par[['P1']], P2 = par[['P2']])
+  par['P1'] <- w[['P1']]
+  par['P2'] <- w[['P2']]
 
-  Sx <- f1*S_wei + f2*S_igom + f3*S_gom
-  Sx <- pmax(0, pmin(1, Sx))
+  Sx <- w[['P1']]*S_wei + w[['P2']]*S_igom + w[['P3']]*S_gom
   Hx <- -log(Sx)
   hx <- c(Hx[1], diff(Hx)) # here we will need a numerical solution!
   return(list(hx = hx, par = par))
@@ -431,13 +633,17 @@ carriere2 <- function(x, par = NULL){
 
 
 #' Kostaki Model - 1992
+#'
+#' A nine-parameter Heligman-Pollard variant whose accident-hump term has two
+#' dispersion parameters, one either side of a cut age, so the hump can be
+#' asymmetric.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples kostaki(x = 0:100)
 #' @keywords internal
 #' @export
 kostaki <- function(x, par = NULL){
-  par <- bring_parameters('kostaki', par)
+  par <- bring_parameters(law = 'kostaki', par = par)
   with(as.list(par), {
     # Sometimes the difference between estimated parameters E1 and E2 is
     # very large, in which case the resulting mortality curve will exhibit
@@ -458,30 +664,37 @@ kostaki <- function(x, par = NULL){
 
 
 #' Kannisto Mortality Law - 1998
+#'
+#' The Kannisto logistic hazard, which rises like Gompertz and levels off at a
+#' ceiling of one; the field standard for closing a life table at old age (see
+#' the \code{close} and \code{omega} arguments of \code{\link{LifeTable}}).
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples kannisto(x = 85:120)
 #' @keywords internal
 #' @export
 kannisto <- function(x, par = NULL){
-  par <- bring_parameters('kannisto', par)
+  par <- bring_parameters(law = 'kannisto', par = par)
   with(as.list(par), {
     hx  <- A*exp(B*x) / (1 + A*exp(B*x))
-    Hx  <- 1/A * log((1 + B*exp(B*x)) / (1 + A))
+    Hx  <- (1/B) * log((1 + A*exp(B*x)) / (1 + A))
     Sx  <- exp(-Hx)
-    return(list(hx = hx, par = par))
+    return(list(hx = hx, par = par, Sx = Sx))
   })
 }
 
 
 #' Kannisto-Makeham Mortality Law - 1998
+#'
+#' The Kannisto logistic hazard plus a constant, for the age-independent
+#' component above the logistic ceiling.
 #' @inheritParams gompertz
 #' @inherit gompertz return
 #' @examples kannisto_makeham(x = 85:120)
 #' @keywords internal
 #' @export
 kannisto_makeham <- function(x, par = NULL){
-  par <- bring_parameters('kannisto_makeham', par)
+  par <- bring_parameters(law = 'kannisto_makeham', par = par)
   with(as.list(par), {
     hx  <- A*exp(B*x) / (1 + A*exp(B*x)) + C
     return(list(hx = hx, par = par))
@@ -489,14 +702,109 @@ kannisto_makeham <- function(x, par = NULL){
 }
 
 
-#' Bring or Rename Starting Parameters in the Law Functions
-#' @inheritParams MortalityLaw
+#' Makeham Log-Quadratic Mortality Law (GM(1,3)) - 1988
+#'
+#' The generalised Gompertz-Makeham graduation formula of Forfar, McCutcheon
+#' and Wilkie: a Makeham constant plus a Gompertz whose log hazard carries a
+#' quadratic term, \eqn{\mu_x = A_0 + K \exp(B_1 x - B_2 x^2)}. The quadratic
+#' term bends the exponential rise downward, so the hazard decelerates at the
+#' oldest ages. This is the family UK pensioner tables are graduated with (the
+#' CMI S2 and 08 series) and the best-fitting law for the Canadian CPM2014
+#' experience. SIGN IS A CHOICE: the published fits put a negative coefficient
+#' on the square, so it is written here as \eqn{-B_2 x^2} with \eqn{B_2 > 0},
+#' the branch the engine's positive parameters permit; the accelerating branch
+#' is out of reach.
 #' @inheritParams gompertz
-#' @return Vector or initial model parameters
+#' @inherit gompertz return
+#' @examples makeham_logquad(x = 0:100)
 #' @keywords internal
+#' @export
+makeham_logquad <- function(x, par = NULL){
+  par <- bring_parameters(law = 'makeham_logquad', par = par)
+  hx  <- with(as.list(par), A0 + K*exp(B1*x - B2*x^2) )
+  return(list(hx = hx, par = par))
+}
+
+
+#' Gompertz Log-Quadratic Mortality Law (GM(0,3)) - 1988
+#'
+#' The generalised Gompertz-Makeham formula without the Makeham constant: a
+#' Gompertz whose log hazard is quadratic,
+#' \eqn{\mu_x = K \exp(B_1 x - B_2 x^2)}. It is the \eqn{GM(0, 3)} member of
+#' the family and the log-quadratic law used to test for deceleration in old
+#' age; prefer it when background mortality is negligible and the constant of
+#' \code{makeham_logquad} is not wanted. SIGN IS A CHOICE, as in
+#' \code{makeham_logquad}: only the decelerating branch is reachable.
+#' @inheritParams gompertz
+#' @inherit gompertz return
+#' @examples gompertz_logquad(x = 0:100)
+#' @keywords internal
+#' @export
+gompertz_logquad <- function(x, par = NULL){
+  par <- bring_parameters(law = 'gompertz_logquad', par = par)
+  hx  <- with(as.list(par), K*exp(B1*x - B2*x^2) )
+  return(list(hx = hx, par = par))
+}
+
+
+#' Validate User-Supplied Parameters of a Mortality Law
+#'
+#' Checks that the supplied parameters form a numeric vector with the right
+#' names and strictly positive values, ordered like the law's defaults.
+#' @param law Name of the mortality law (character string).
+#' @param par User-supplied parameter values.
+#' @param Spar Default parameters of the law (named numeric vector).
+#' @return A named numeric vector with the validated parameters.
+#' @noRd
+check_parameters <- function(law, par, Spar) {
+
+  if (!is.numeric(par) || !is.null(dim(par))) {
+    stop("'par' for law '", law, "' must be a numeric vector.", call. = FALSE)
+  }
+
+  if (!is.null(names(par))) {
+    if (anyDuplicated(names(par)) > 0 || !setequal(names(par), names(Spar))) {
+      stop(
+        "Invalid parameter names for law '", law, "'. Expected: ",
+        paste(names(Spar), collapse = ", "), "; got: ",
+        paste(names(par), collapse = ", "), ".",
+        call. = FALSE)
+    }
+    par <- par[names(Spar)]
+  } else {
+    if (length(par) != length(Spar)) {
+      stop(
+        "'par' for law '", law, "' must have ", length(Spar),
+        " elements (", paste(names(Spar), collapse = ", "), "); got ",
+        length(par), ".",
+        call. = FALSE)
+    }
+    names(par) <- names(Spar)
+  }
+
+  if (anyNA(par) || any(par <= 0)) {
+    stop(
+      "All parameters in 'par' for law '", law,
+      "' must be positive numeric values.",
+      call. = FALSE)
+  }
+
+  return(par)
+}
+
+
+#' Bring or Rename Starting Parameters in the Law Functions
+#'
+#' Provides the defaults when \code{par} is \code{NULL}, otherwise matches a
+#' named \code{par} by name (unnamed positionally) and validates it.
+#' @inheritParams MortalityLaw
+#' @param par A named numeric vector of parameter values, matched to the law's
+#'   parameters by name, or unnamed and read positionally.
+#' @return Vector or initial model parameters
+#' @noRd
 bring_parameters <- function(law, par = NULL) {
   Spar <- switch(law,
-            demoivre    = c(A = 105),
+            demoivre    = c(N = 110),
             gompertz    = c(A = 0.0002, B = 0.13),
             gompertz0   = c(sigma = 7.7, M = 49),
             invgompertz = c(sigma = 7.7, M = 49),
@@ -506,12 +814,17 @@ bring_parameters <- function(law, par = NULL) {
             thiele      = c(A = .02474, B = .3, C = .004, D = .5,
                            E = 25, F_ = .0001, G = .13),
             wittstein   = c(A = 1.5, B = 1, N = .5, M = 100),
-            perks       = c(A = .002, B = .13, C = .01, D = .01),
+            perks       = c(A = .0005, B = .0002, C = 1.1, D = .01),
+            steffensen  = c(A = .0005, B = .02, C = 1.05, D = .1),
+            neggompertz = c(A = .02, B = .4),
+            pareto_2    = c(A = .01, C = .001),
+            scholey_shifted_power = c(A = .01, B = .7, C = .01),
+            scholey     = c(A = .01, B = .7, C = .01, D = .1),
             weibull     = c(sigma = 2, M = 1),
             invweibull  = c(sigma = 10, M = 5),
             vandermaen  = c(A = .01, B = 1, C = .01, I = 100, N = 200),
             vandermaen2 = c(A = .01, B = 1, I = 100, N = 200),
-            strehler_mildvan = c(K = .01, V0 = 2.5, B = 0.2, D = 6),
+            strehler_mildvan = c(A = 0.0001, B = 0.1, V = 1),
             quadratic   = c(A = .01, B = 1, C = .01),
             beard       = c(A = .002, B = .13, K = 1),
             beard_makeham = c(A = .002, B = .13, C = .01, K = 1),
@@ -537,10 +850,24 @@ bring_parameters <- function(law, par = NULL) {
                            P2 = .01, sigma2 = 7, M2 = 49,
                            sigma3 = 7, M3 = 49),
             kannisto   = c(A = 0.5, B = 0.13),
-            kannisto_makeham = c(A = 0.5, B = 0.13, C = 0.001)
+            kannisto_makeham = c(A = 0.5, B = 0.13, C = 0.001),
+            makeham_logquad        = c(A0 = .001, K = .001, B1 = .1, B2 = .001),
+            gompertz_logquad        = c(K = .001, B1 = .1, B2 = .001)
             )
-  if (is.null(par)) par <- Spar
-  # If 'par' is provided, just give them a name anyway.
-  names(par) <- names(Spar)
+
+  if (is.null(Spar)) {
+    stop("Unknown mortality law '", law, "'.", call. = FALSE)
+  }
+
+  if (is.null(par)) {
+    par <- Spar
+  } else {
+    par <- check_parameters(
+      law = law,
+      par = par,
+      Spar = Spar
+      )
+  }
+
   return(par)
 }

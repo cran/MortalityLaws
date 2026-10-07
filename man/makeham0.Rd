@@ -7,16 +7,17 @@
 makeham0(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Makeham Mortality Law - informative parameterization
+The Makeham hazard with the exponential term in mode/dispersion form,
+\eqn{\mu_x = (1/\sigma) \exp((x - M)/\sigma) + C}.
 }
 \examples{
 makeham0(x = 45:90)

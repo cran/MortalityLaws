@@ -7,16 +7,17 @@
 quadratic(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-Quadratic Model
+A plain quadratic hazard, \eqn{\mu_x = A + Bx + Cx^2}; a smooth baseline
+over the adult ages that cannot level off at the oldest ages.
 }
 \examples{
 quadratic(x = 0:100)

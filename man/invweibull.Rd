@@ -7,19 +7,17 @@
 invweibull(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-The Inverse-Weibull proves useful for modelling the childhood and teenage years,
-because the logarithm of h(x) is a concave function.
-m > 0 is a measure of location
-sigma > 0 is measure of dispersion
+The inverse-Weibull hazard; useful for childhood and the teenage years,
+where the logarithm of the hazard is concave.
 }
 \examples{
 invweibull(x = 1:20)

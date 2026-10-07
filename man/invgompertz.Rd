@@ -7,17 +7,17 @@
 invgompertz(x, par = NULL)
 }
 \arguments{
-\item{x}{vector of age at the beginning of the age classes}
+\item{x}{vector of age at the beginning of the age classes.}
 
-\item{par}{parameters of the selected model. If NULL the
-default values will be assigned automatically.}
+\item{par}{parameters of the selected model. If \code{NULL} the default
+values are assigned automatically.}
 }
 \value{
-A list of rates and model parameters
+A list of rates and model parameters.
 }
 \description{
-m - is a measure of location because it is the mode of the density, m > 0
-sigma - represents the dispersion of the density about the mode, sigma > 0
+The inverse-Gompertz hazard, which falls with age; it describes the decline
+of mortality after the infant peak.
 }
 \examples{
 invgompertz(x = 15:25)

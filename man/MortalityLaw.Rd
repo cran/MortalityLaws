@@ -50,7 +50,7 @@ See \code{\link{availableLF}} for details.}
 
 \item{parS}{Optional starting parameter values for the optimisation. If
 \code{NULL}, sensible defaults are automatically chosen via
-\code{\link{bring_parameters}}.}
+\code{bring_parameters}.}
 
 \item{fit.this.x}{A subset of \code{x} over which to fit the model. The
 default is the entire \code{x} vector. Use this to exclude, for example,
@@ -76,14 +76,28 @@ components:
 vector for a single fit, or a matrix for multiple fits.}
 \item{fitted.values}{Fitted hazard rates (or death probabilities) evaluated
 at the input ages \code{x}.}
-\item{residuals}{Deviance residuals, computed as observed minus fitted
-values.}
-\item{goodness.of.fit}{List or matrix of goodness-of-fit measures: AIC,
-BIC and log-likelihood (available only for likelihood-based methods).}
+\item{residuals}{Raw residuals, observed minus fitted values.}
+\item{deviance.residuals}{Deviance residuals. For the count cases
+(\code{Dx}/\code{Ex}) they are the Poisson deviance residuals; for the rate
+cases (\code{mx}, \code{qx}) they are the log-residuals.}
+\item{pearson.residuals}{Pearson residuals. For the count cases they are the
+Poisson Pearson residuals; for the rate cases they are the log-residuals.}
+\item{goodness.of.fit}{Named numeric vector (single fit) or matrix (one row
+per fit) with log-likelihood, AIC and BIC (NaN for non-likelihood methods).
+For count fits the log-likelihood is the Poisson or binomial kernel: the
+data-only additive constants are dropped, which leaves model comparison
+(AIC/BIC) unaffected but makes the absolute value differ from \code{glm}.}
 \item{opt.diagnosis}{Object returned by the optimisation routine, useful
 for checking convergence.}
-\item{df}{Number of parameters and residual degrees of freedom.}
-\item{deviance}{Sum of squared log-residuals, used as a deviance measure.}
+\item{df}{Number of parameters, residual degrees of freedom and the
+dispersion.}
+\item{dispersion}{Dispersion of the fit. For the count cases it is the
+Pearson chi-square divided by the residual degrees of freedom (the GLM
+dispersion, 1 for a correctly specified Poisson model); for the rate cases
+it is the mean squared log-residual.}
+\item{deviance}{The deviance of the fit. For the count cases this is the
+Poisson deviance, the quantity minimised by \code{"poissonL"}; for the rate
+cases it is the sum of squared log-residuals.}
 }
 \description{
 Fit parametric mortality models given a set of input data. The data can be
@@ -133,7 +147,8 @@ coef(M1)
 summary(M1)
 fitted(M1)
 predict(M1, x = 45:95)
-plot(M1)
+plot(M1, which = 'fit')
+plot(M1, which = 'diagnostics')
 
 
 # Example 2: --------------------------
@@ -154,13 +169,14 @@ predict(M2, x = 55:90)
 
 # A function with 'x' and 'par' as input has to be defined, which returns
 # at least an object called 'hx' (hazard rate).
-my_gompertz <- function(x, par = c(b = 0.13, M = 45)){
+missov <- function(x, par = c(b = 0.13, M = 45)){
   hx  <- with(as.list(par), b*exp(b*(x - M)) )
   return(as.list(environment()))
 }
 
-M3 <- MortalityLaw(x = x, Dx = Dx, Ex = Ex, custom.law = my_gompertz)
+M3 <- MortalityLaw(x = x, Dx = Dx, Ex = Ex, custom.law = missov)
 summary(M3)
+plot(M3)
 # predict M3 for different ages
 predict(M3, x = 85:130)
 
@@ -173,7 +189,9 @@ x  <- 0:100
 mx <- ahmd$mx[paste(x), "1950"] # select data
 M4 <- MortalityLaw(x = x, mx = mx, law = 'HP', opt.method = 'LF2')
 M4
-plot(M4)
+plot(M4, which = 'fit')
+plot(M4, which = 'diagnostics')
+plot(M4, which = 'both')
 
 LifeTable(x = x, qx = fitted(M4))
 }
